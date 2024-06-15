@@ -25,6 +25,78 @@ public class TestController {
         return ResponseEntity.ok(returnList);
     }
 
+    @GetMapping(path = "/product")
+    public ResponseEntity<Product> getTestProduct(){
+
+        List<Ingredient> ingredients = List.of(
+                new Ingredient(18066L, "water", "PLACEHOLDER - no desc yet", 21.75f),
+                new Ingredient(9100L, "long-grain-rice", "PLACEHOLDER - no desc yet", 7.25f),
+                new Ingredient(18066L, "water", "PLACEHOLDER - no desc yet", 12.65f),
+                new Ingredient(20034L, "onion", "PLACEHOLDER - no desc yet", 5.175f),
+                new Ingredient(0L, "rapeseed-oil", "PLACEHOLDER - no desc yet", 2.5875f),
+                new Ingredient(11000L, "garlic-puree", "PLACEHOLDER - no desc yet", 1.29375f),
+                new Ingredient(2028L, "lemon-juice-from-concentrate", "PLACEHOLDER - no desc yet", 0.646875f),
+                new Ingredient(11014L, "parsley", "PLACEHOLDER - no desc yet", 0.3234375f),
+                new Ingredient(11049L, "paprika", "PLACEHOLDER - no desc yet", 0.16171875f),
+                new Ingredient(0L, "maltodextrin", "PLACEHOLDER - no desc yet", 0.0404296875f),
+                new Ingredient(0L, "yeast-extract", "PLACEHOLDER - no desc yet", 0.02021484375f),
+                new Ingredient(31016L, "sugar", "PLACEHOLDER - no desc yet", 0.010107421875f),
+                new Ingredient(11058L, "salt", "PLACEHOLDER - no desc yet", 0.0050537109375f),
+                new Ingredient(20009L, "carrot", "PLACEHOLDER - no desc yet", 0.00252685546875f),
+                new Ingredient(20034L, "onion", "PLACEHOLDER - no desc yet", 0.001263427734375f),
+                new Ingredient(20047L, "tomato", "PLACEHOLDER - no desc yet", 0.001263427734375f),
+                new Ingredient(0L, "vegetable", "PLACEHOLDER - no desc yet", 0.0050537109375f),
+                new Ingredient(0L, "e415", "PLACEHOLDER - no desc yet", 0.0404296875f),
+                new Ingredient(11015L, "black-pepper", "PLACEHOLDER - no desc yet", 0.0404296875f),
+                new Ingredient(0L, "chicken", "PLACEHOLDER - no desc yet", 20.765f),
+                new Ingredient(11058L, "salt", "PLACEHOLDER - no desc yet", 0.234999999999999f),
+                new Ingredient(0L, "pea", "PLACEHOLDER - no desc yet", 8.0f),
+                new Ingredient(20047L, "tomato", "PLACEHOLDER - no desc yet", 4.545f),
+                new Ingredient(17440L, "sunflower-oil", "PLACEHOLDER - no desc yet", 1.2275f),
+                new Ingredient(11058L, "salt", "PLACEHOLDER - no desc yet", 0.235f),
+                new Ingredient(11000L, "garlic", "PLACEHOLDER - no desc yet", 0.235f),
+                new Ingredient(11035L, "oregano", "PLACEHOLDER - no desc yet", 0.7575f),
+                new Ingredient(20087L, "red-bell-pepper", "PLACEHOLDER - no desc yet", 7.0f),
+                new Ingredient(0L, "pork", "PLACEHOLDER - no desc yet", 2.69230769230769f),
+                new Ingredient(16530L, "pork-fat", "PLACEHOLDER - no desc yet", 1.15384615384615f),
+                new Ingredient(0L, "pork-rind", "PLACEHOLDER - no desc yet", 0.576923076923077f),
+                new Ingredient(11049L, "paprika", "PLACEHOLDER - no desc yet", 0.288461538461538f),
+                new Ingredient(11058L, "salt", "PLACEHOLDER - no desc yet", 0.144230769230769f),
+                new Ingredient(0L, "sodium-nitrite", "PLACEHOLDER - no desc yet", 0.0721153846153846f),
+                new Ingredient(0L, "spices", "PLACEHOLDER - no desc yet", 0.0360576923076925f),
+                new Ingredient(0L, "spice-extract", "PLACEHOLDER - no desc yet", 0.0180288461538463f),
+                new Ingredient(0L, "glucono-delta-lactone", "PLACEHOLDER - no desc yet", 0.00901442307692335f),
+                new Ingredient(31016L, "dextrose", "PLACEHOLDER - no desc yet", 0.00450721153846168f),
+                new Ingredient(11000L, "garlic", "PLACEHOLDER - no desc yet", 0.00225360576923084f),
+                new Ingredient(0L, "sodium-ascorbate", "PLACEHOLDER - no desc yet", 0.00112680288461542f),
+                new Ingredient(11048L, "nutmeg", "PLACEHOLDER - no desc yet", 0.00112680288461497f)
+
+        );
+
+        List<Tag> tags = List.of(
+                new Tag(0l, "Not vegan"),
+                new Tag(0l, "Not vegetarian"),
+                new Tag(0l, "May contain gluten")
+
+        );
+
+        long ingredientId = 55904223289L;
+
+
+        //score is nutriscore
+        Product product = new Product(
+                ingredientId,
+                "High Protein Chicken & Chorizo Paella",
+                "B",
+                "Muscle Foood",
+                "https://images.openfoodfacts.org/images/products/505/590/422/3289/front_en.3.400.jpg",
+                tags, ingredients);
+
+
+        return ResponseEntity.ok(product);
+    }
+    
+
 
 
     private List<Product> generateListOfProducts() {
@@ -50,26 +122,26 @@ public class TestController {
         );
 
         return List.of(
-                new Product(1L, "Ketchup", "C", List.of(tags.get(0), tags.get(1)), List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
-                new Product(2L, "Mustard French", "B", List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
-                new Product(3L, "Mayonnaise Light", "A", List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
-                new Product(4L, "Barbecue Sauce", "B", List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5))),
-                new Product(5L, "Hot Sauce", "C", List.of(tags.get(1), tags.get(3)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
-                new Product(6L, "Salad Dressing", "A", List.of(tags.get(4), tags.get(2)), List.of(ingredients.get(6), ingredients.get(8), ingredients.get(9))),
-                new Product(7L, "Soy Sauce", "B", List.of(tags.get(0), tags.get(4)), List.of(ingredients.get(7), ingredients.get(1), ingredients.get(3))),
-                new Product(8L, "Teriyaki Sauce", "A", List.of(tags.get(1), tags.get(2)), List.of(ingredients.get(0), ingredients.get(5), ingredients.get(9))),
-                new Product(9L, "Pesto Sauce", "C", List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(8), ingredients.get(7))),
-                new Product(10L, "Ranch Dressing", "B", List.of(tags.get(2), tags.get(1)), List.of(ingredients.get(2), ingredients.get(3), ingredients.get(6))),
-                new Product(11L, "Caesar Dressing", "A", List.of(tags.get(4), tags.get(0)), List.of(ingredients.get(1), ingredients.get(9), ingredients.get(0))),
-                new Product(12L, "Thousand Island", "B", List.of(tags.get(3), tags.get(2)), List.of(ingredients.get(5), ingredients.get(7), ingredients.get(8))),
-                new Product(13L, "Tartar Sauce", "C", List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
-                new Product(14L, "Honey Mustard", "B", List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(1), ingredients.get(3))),
-                new Product(15L, "Buffalo Sauce", "A", List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(8), ingredients.get(7), ingredients.get(2))),
-                new Product(16L, "Sriracha Sauce", "C", List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(5), ingredients.get(9), ingredients.get(6))),
-                new Product(17L, "Tzatziki Sauce", "B", List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(7), ingredients.get(0))),
-                new Product(18L, "Marinara Sauce", "A", List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(8))),
-                new Product(19L, "Salsa", "C", List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
-                new Product(20L, "Guacamole", "A", List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
+                new Product(1L, "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)), List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
+                new Product(2L, "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
+                new Product(3L, "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
+                new Product(4L, "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5))),
+                new Product(5L, "Hot Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(3)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
+                new Product(6L, "Salad Dressing", "A","Brand",null, List.of(tags.get(4), tags.get(2)), List.of(ingredients.get(6), ingredients.get(8), ingredients.get(9))),
+                new Product(7L, "Soy Sauce", "B","Brand",null, List.of(tags.get(0), tags.get(4)), List.of(ingredients.get(7), ingredients.get(1), ingredients.get(3))),
+                new Product(8L, "Teriyaki Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(2)), List.of(ingredients.get(0), ingredients.get(5), ingredients.get(9))),
+                new Product(9L, "Pesto Sauce", "C", "Brand",null,List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(8), ingredients.get(7))),
+                new Product(10L, "Ranch Dressing", "B","Brand",null, List.of(tags.get(2), tags.get(1)), List.of(ingredients.get(2), ingredients.get(3), ingredients.get(6))),
+                new Product(11L, "Caesar Dressing", "Brand",null,"A", List.of(tags.get(4), tags.get(0)), List.of(ingredients.get(1), ingredients.get(9), ingredients.get(0))),
+                new Product(12L, "Thousand Island", "Brand",null,"B", List.of(tags.get(3), tags.get(2)), List.of(ingredients.get(5), ingredients.get(7), ingredients.get(8))),
+                new Product(13L, "Tartar Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
+                new Product(14L, "Honey Mustard", "B","Brand",null, List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(1), ingredients.get(3))),
+                new Product(15L, "Buffalo Sauce", "A","Brand",null,List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(8), ingredients.get(7), ingredients.get(2))),
+                new Product(16L, "Sriracha Sauce", "C","Brand",null, List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(5), ingredients.get(9), ingredients.get(6))),
+                new Product(17L, "Tzatziki Sauce", "B","Brand",null, List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(7), ingredients.get(0))),
+                new Product(18L, "Marinara Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(8))),
+                new Product(19L, "Salsa", "C", "Brand",null,List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
+                new Product(20L, "Guacamole", "A", "Brand",null,List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
         );
     }
 

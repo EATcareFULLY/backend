@@ -24,6 +24,12 @@ public class Product {
 
     private String score;
 
+    private String brand;
+
+    private String imageURL;
+
+
+
     @ManyToMany
     private List<Tag> tags;
 
