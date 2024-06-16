@@ -19,6 +19,11 @@ public class TestController {
         return ResponseEntity.ok("Hello there");
     }
 
+    @GetMapping(path = "/secure")
+    public ResponseEntity<String> secureHelloWorld(){
+        return ResponseEntity.ok("Hello from secure endpoint");
+    }
+
     @GetMapping(path = "/products")
     public ResponseEntity<List<Product>> getTestProducts(){
         List<Product> returnList = generateListOfProducts();
