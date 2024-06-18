@@ -1,5 +1,21 @@
 version: "3.8"
+
 services:
+
+  database_server:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eatcarefully
+    ports:
+      - "6543:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - eat_network
+
   keycloak:
     container_name: keycloak
     image: bitnami/keycloak:24.0.5
@@ -27,21 +43,23 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: keycloakdb
     ports:
-      - "5432:5432"
+      - "54321:5432"
     healthcheck:
       test: "exit 0"
     networks:
       - eat_network
-#  spring_app:
-#    container_name: spring
+
+#  server:
 #    build: .
-#    restart: on-failure
 #    ports:
-#      - "8082:8082"
-#    stdin_open: true
+#      - "8081:8081"
 #    networks:
 #      - eat_network
+#    depends_on: [database_server]
+
 networks:
   eat_network:
+volumes:
+  postgres_data:
 
 
