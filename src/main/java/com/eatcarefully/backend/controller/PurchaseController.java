@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/purchase")
+@RequestMapping("/purchases")
 public class PurchaseController {
     private final PurchaseService shoppingService;
 
@@ -18,7 +18,7 @@ public class PurchaseController {
         this.shoppingService = shoppingService;
     }
 
-    @GetMapping("/add")
+    @GetMapping("/add") //TODO: change to POST, add input data to request body
     public ResponseEntity<String> addPurchase(Principal principal, @RequestParam("barcode") Long barcode) {
         shoppingService.addPurchase(principal.getName(), /*1234L*/barcode);
         return ResponseEntity.ok("Purchase added successfully");
