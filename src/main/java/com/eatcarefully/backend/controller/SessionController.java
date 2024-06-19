@@ -12,7 +12,7 @@ public class SessionController {
 
     @GetMapping("/logout")
     public String logout() {
-        return "redirect:/logout";
+        return "redirect:http://localhost:8080/realms/eat-carefully/protocol/openid-connect/logout";
     }
 
     @GetMapping("/user")
