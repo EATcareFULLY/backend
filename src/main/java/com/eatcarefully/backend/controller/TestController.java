@@ -2,12 +2,15 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
+import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.model.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -28,6 +31,18 @@ public class TestController {
     public ResponseEntity<List<Product>> getTestProducts(){
         List<Product> returnList = generateListOfProducts();
         return ResponseEntity.ok(returnList);
+    }
+    @GetMapping(path = "/purchases")
+    public ResponseEntity<List<Purchase>> getTestPurchases(){
+        List<Purchase> mockPurchases = new ArrayList<>();
+        List<Product> products = generateListOfProducts();
+
+        for (int i = 0; i < 20; i++) {
+            Product product = products.get(i % products.size());
+            Purchase purchase = new Purchase((long) i, "user", product, LocalDateTime.now());
+            mockPurchases.add(purchase);
+        }
+        return ResponseEntity.ok(mockPurchases);
     }
 
     @GetMapping(path = "/product")
