@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/purchases")
+@RequestMapping("/purchases")   //TODO: add global /api/v1 prefix
 public class PurchaseController {
     private final PurchaseService shoppingService;
 
@@ -18,18 +18,18 @@ public class PurchaseController {
         this.shoppingService = shoppingService;
     }
 
-    @GetMapping("/add") //TODO: change to POST, add input data to request body
-    public ResponseEntity<String> addPurchase(Principal principal, @RequestParam("barcode") Long barcode) {
-        shoppingService.addPurchase(principal.getName(), /*1234L*/barcode);
+    @PostMapping()
+    public ResponseEntity<String> addPurchase(Principal principal, @RequestBody PurchaseRequest purchaseRequest) {
+        shoppingService.addPurchase(principal.getName(), purchaseRequest);
         return ResponseEntity.ok("Purchase added successfully");
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<Purchase>> getAllPurchases(Principal principal) {
         return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(principal.getName()));
     }
 
-    @GetMapping("/range")
+    @GetMapping()
     public List<Purchase> getPurchasesByDateRange(
             Principal principal,
             @RequestParam("startDate") LocalDateTime startDate,
