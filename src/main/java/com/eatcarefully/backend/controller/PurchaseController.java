@@ -24,12 +24,12 @@ public class PurchaseController {
         return ResponseEntity.ok("Purchase added successfully");
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<Purchase>> getAllPurchases(Principal principal) {
         return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(principal.getName()));
     }
 
-    @GetMapping()
+    @GetMapping("/range")
     public List<Purchase> getPurchasesByDateRange(
             Principal principal,
             @RequestParam("startDate") LocalDateTime startDate,
