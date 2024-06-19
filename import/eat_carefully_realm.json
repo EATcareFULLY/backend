@@ -661,7 +661,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "HtGU6TxlSfOz2rKBnhEi9XRk2rLJtKJw",
       "redirectUris": [
         "http://localhost:8081/login/oauth2/code/keycloak"
       ],
