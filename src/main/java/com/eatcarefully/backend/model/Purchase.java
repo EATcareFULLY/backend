@@ -27,5 +27,5 @@ public class Purchase {
 
     private LocalDateTime purchaseDate;
 
-//    private int quantity;
+    private int quantity;
 }

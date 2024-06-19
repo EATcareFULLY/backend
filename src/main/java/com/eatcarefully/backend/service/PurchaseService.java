@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.service;
 
+import com.eatcarefully.backend.controller.PurchaseRequest;
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Purchase;
@@ -20,12 +21,12 @@ public class PurchaseService {
     private final ProductRepository productRepository;
     private final PurchaseRepository shoppingHistoryRepository;
 
-    public void addPurchase(String username, Long productId) {
+    public void addPurchase(String username, PurchaseRequest purchaseRequest) {
         Ingredient ingredient1 = ingredientRepository.save(new Ingredient(18066L, "water", "PLACEHOLDER - no desc yet", 21.75f));
         Ingredient ingredient2 = ingredientRepository.save(new Ingredient(9100L, "long-grain-rice", "PLACEHOLDER - no desc yet", 7.25f));
         Product product = productRepository.save(
                 new Product(
-                        productId,
+                        purchaseRequest.getBarcode(),
                         "High Protein Chicken & Chorizo Paella",
                         "B",
                         "Muscle Foood",
@@ -33,7 +34,7 @@ public class PurchaseService {
                         List.of(),
                         List.of(ingredient1, ingredient2)
                 ));
-        shoppingHistoryRepository.save(new Purchase(null, username, product/*productRepository.findById(productId).orElseThrow()*/, LocalDateTime.now()));
+        shoppingHistoryRepository.save(new Purchase(null, username, product/*productRepository.findById(purchaseRequest.getBarcode()).orElseThrow()*/, LocalDateTime.now(), purchaseRequest.getQuantity()));
     }
 
     public List<Purchase> getWholePurchaseHistory(String username) {
