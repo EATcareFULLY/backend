@@ -2,6 +2,7 @@ package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
+import com.eatcarefully.backend.model.Tag;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -115,15 +116,39 @@ public class ProductService {
         for( int i = 0; i < ingredientsArray.length(); i++){
 
             JSONObject object = ingredientsArray.getJSONObject(i);
-            String name = object.optString("text");
-            Float content = object.getFloat("percent_estimate");
+            JSONArray innerIngredients = object.optJSONArray("ingredients");
 
-            if(!ingredientsMap.containsKey(name)){
-                ingredientsMap.put(name,content);
+            // if there are nested ingredients skip outer and add inner ingredients
+            if(innerIngredients != null){
+                for( int j = 0; j < innerIngredients.length(); j++){
+
+                    JSONObject innerIngredient = innerIngredients.getJSONObject(j);
+
+                    String name = formatApiString(innerIngredient.optString("id"));
+                    Float content = innerIngredient.optFloat("percent_estimate");
+
+                    if( ingredientsMap.containsKey(name))
+                        ingredientsMap.put(name, ingredientsMap.get(name) + content);
+                    else
+                        ingredientsMap.put(name, content);
+                }
+
             }
+            // if there is no nested ingredients add outer ingredient
+            else{
+                String name = formatApiString(object.optString("id"));
+                Float content = object.optFloat("percent_estimate");
+
+                if( ingredientsMap.containsKey(name))
+                    ingredientsMap.put(name, ingredientsMap.get(name) + content);
+                else
+                    ingredientsMap.put(name, content);
+
+            }
+
         }
 
-        // convert map to list
+        // convert ingredients map to list
         List<Ingredient> ingredients = new ArrayList<>();
 
         ingredientsMap.forEach((name, content) -> {
@@ -156,6 +181,50 @@ public class ProductService {
         }
 
         return latestGrade;
+    }
+
+
+    private List<Tag> getTags(JSONObject productObject){
+
+        List<Tag> tags = new ArrayList<Tag>();
+
+        // vegan
+
+        //vegetarian
+
+        //palm oil
+
+        //gluten
+
+        //allergens
+
+        //eco packaging
+
+        JSONObject packagingObject = productObject.optJSONObject("packaging");
+
+        
+        return tags;
+
+    }
+
+    //remove 'en:' and replace '-' with ' '
+    private String formatApiString(String string){
+
+        if(string == null || string.isEmpty())
+            return null;
+
+        if(string.contains(":")){
+            string = string.split(":")[1];
+        }
+
+        if(string.contains("-")){
+            string = string.replace("-", " ");
+        }
+
+        string = string.substring(0,1).toUpperCase() + string.substring(1);
+
+        return string;
+
     }
 
 }
