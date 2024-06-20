@@ -40,8 +40,14 @@ public class ProductService {
             try {
                 JSONObject openFoodFactAPIResponse = getOpenFoodFactsAPIResponse(barcode);
                 Product productFromJson = parseJSONToProduct(openFoodFactAPIResponse);
-                productRepository.save(productFromJson);
-                return ResponseEntity.ok(productFromJson);
+
+                if(productFromJson == null){
+                    return ResponseEntity.ok(new Product());
+                }
+                else {
+                    productRepository.save(productFromJson);
+                    return ResponseEntity.ok(productFromJson);
+                }
 
 
             } catch (IOException | InterruptedException | NoSuchFieldException e) {
@@ -62,7 +68,7 @@ public class ProductService {
         String url =
                 "https://world.openfoodfacts.org/api/v3/product/"
         + barcode
-        + "?fields=product_name,allergens_hierarchy,ingredients,brands,ingredients_analysis,nutriments,nutrient_levels,nutriscore,keywords,additive_original_tags,selected_images,ecoscore_data";
+        + "?fields=product_name,product_name_ar,product_name_cs,product_name_da,product_name_de,product_name_en,product_name_es,product_name_et,product_name_fiproduct_name_fr,product_name_it,product_name_lt,product_name_lv,product_name_no,product_name_pl,product_name_pt,product_name_ru,product_name_sv,product_name_zh,allergens_hierarchy,ingredients,brands,ingredients_analysis,nutriments,nutrient_levels,nutriscore,keywords,additive_original_tags,selected_images,ecoscore_data";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -73,7 +79,25 @@ public class ProductService {
         return new JSONObject(response.body());
     }
 
+    private Boolean isProductFoundInOpenFoodFacts(JSONObject json){
+
+        JSONObject result = json.optJSONObject("result");
+        if(result != null){
+            String resultId = result.optString("id");
+
+            if(resultId.equals("product_found"))
+                return true;
+        }
+
+        return false;
+
+    }
+
     private Product parseJSONToProduct(JSONObject json) throws NoSuchFieldException {
+
+        if(!isProductFoundInOpenFoodFacts(json)){
+            return null;
+        }
 
         JSONObject productObject = json.optJSONObject("product");
 
@@ -81,7 +105,7 @@ public class ProductService {
             throw new NoSuchFieldException();
 
         Long id = json.optLong("code");
-        String name = productObject.optString("product_name");
+        String name = getProductName(productObject);
         String brand = productObject.optString("brands");
 
         JSONObject imagesObject = productObject.optJSONObject("selected_images");
@@ -102,6 +126,35 @@ public class ProductService {
 
 
         return product;
+
+    }
+
+    private String getProductName(JSONObject productObject){
+
+        //check for default name
+        String name = productObject.optString("product_name");
+
+        if(name != null  &&  !name.isEmpty())
+            return name;
+
+        //no default name -> check for english name
+        name = productObject.optString("product_name_en");
+
+        if(name != null  &&  !name.isEmpty())
+            return name;
+
+        // no default or english name -> check for any name
+
+        List<String> productKeySet = productObject.keySet().stream().toList();
+
+        for(String key : productKeySet){
+            if(key.startsWith("product_name_")) {
+                name = productObject.optString(key);
+                if (name != null && !name.isEmpty())
+                    break;
+            }
+        }
+        return name;
 
     }
 
@@ -373,7 +426,9 @@ public class ProductService {
             return null;
 
         if(string.contains(":")){
-            string = string.split(":")[1];
+            String[] temp = string.split(":");
+            if(temp.length > 1)
+                string = temp[1];
         }
 
         if(string.contains("-")){

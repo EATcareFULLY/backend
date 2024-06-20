@@ -17,6 +17,8 @@ public class ProductController {
 
     @GetMapping("/{barcode}")
     public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable Long barcode) {
+
+
         return productService.getProductDetailsByBarcode(barcode);
     }
 }
