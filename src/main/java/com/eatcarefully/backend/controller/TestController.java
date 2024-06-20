@@ -4,6 +4,10 @@ import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.model.Tag;
+import com.eatcarefully.backend.repository.IngredientRepository;
+import com.eatcarefully.backend.repository.ProductRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +19,14 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/test")
+
 public class TestController {
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
@@ -32,6 +43,19 @@ public class TestController {
         List<Product> returnList = generateListOfProducts();
         return ResponseEntity.ok(returnList);
     }
+
+    @GetMapping(path = "/db/products")
+    public ResponseEntity<List<Product>> getTestProductsDB(){
+        List<Product> returnList = productRepository.findAll().stream().toList();
+        return ResponseEntity.ok(returnList);
+    }
+
+    @GetMapping(path = "/db/ingredients")
+    public ResponseEntity<List<Ingredient>> getTestIngredientsDB(){
+        List<Ingredient> returnList = ingredientRepository.findAll().stream().toList();
+        return ResponseEntity.ok(returnList);
+    }
+
     @GetMapping(path = "/purchases")
     public ResponseEntity<List<Purchase>> getTestPurchases(){
         List<Purchase> mockPurchases = new ArrayList<>();

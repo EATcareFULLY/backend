@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -33,6 +34,6 @@ public class Product {
     @ManyToMany
     private List<Tag> tags;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Ingredient> ingredients;
 }
