@@ -5,6 +5,7 @@ import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Tag;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
+import com.eatcarefully.backend.repository.TagRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -25,7 +26,7 @@ import java.util.*;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final IngredientRepository ingredientRepository;
+    private final TagRepository tagRepository;
 
     public ResponseEntity<?> getProductDetailsByBarcode(Long barcode) {
         Optional<Product> product = productRepository.findById(barcode); //TODO: maybe change to findProductByBarcode and leave ID auto generated
@@ -88,7 +89,9 @@ public class ProductService {
         JSONArray ingredientsArray = productObject.optJSONArray("ingredients");
         List<Ingredient> ingredients = ingredientsArray != null ? getIngredientsList(ingredientsArray) : List.of();
 
-        Product product = new Product(id, name,nutriscore, brand, frontImageUrl, null, ingredients);
+        List<Tag> tags = getTags(productObject);
+
+        Product product = new Product(id, name,nutriscore, brand, frontImageUrl, tags, ingredients);
 
 
 
@@ -102,8 +105,19 @@ public class ProductService {
         JSONObject front = imagesObject.optJSONObject("front");
         if(front != null){
             JSONObject display = front.optJSONObject("display");
-            if(display != null){
-                return display.optString("en");
+            if(display != null && ! display.keySet().isEmpty()){
+
+                //get english version if possible
+                if(display.keySet().contains("en")){
+                    String imageUrl = display.optString("en");
+                    return imageUrl;
+                }
+                //else get first
+                else{
+
+                    String imageUrl = display.optString(display.keySet().toArray()[0].toString());
+                    return imageUrl;
+                }
             }
         }
         return null;
@@ -188,22 +202,126 @@ public class ProductService {
 
         List<Tag> tags = new ArrayList<Tag>();
 
-        // vegan
+        JSONObject ingredientAnalysisObject = getNestedObject(productObject, List.of(
+                "ingredients_analysis"
+        ));
 
-        //vegetarian
+        if(ingredientAnalysisObject != null){
 
-        //palm oil
+            Set<String> ingredientAnalysisKeySet = ingredientAnalysisObject.keySet();
+            log.info(ingredientAnalysisKeySet.toString());
+
+            // vegan
+            // no fields non-vegan and vegan-status-unknown
+
+            if(!ingredientAnalysisKeySet.contains("en:non-vegan") && !ingredientAnalysisKeySet.contains("en:vegan-status-unknown")){
+                tags.add(findOrCreateTag("Vegan"));
+            }
+
+
+            //vegetarian
+            if(!ingredientAnalysisKeySet.contains("en:non-vegetarian") && !ingredientAnalysisKeySet.contains("en:vegetarian-status-unknown")){
+                tags.add(findOrCreateTag("Vegetarian"));
+            }
+
+
+            //palm oil
+
+            if(ingredientAnalysisKeySet.contains("en:palm-oil")){
+                tags.add(findOrCreateTag("Contains palm oil"));
+            }
+            else{
+                if(ingredientAnalysisKeySet.contains("en:palm-oil-content-unknown")){
+                    tags.add(findOrCreateTag("May contain palm oil"));
+                }
+            }
+
+
+        }
 
         //gluten
 
-        //allergens
+        JSONArray allergensHierarchy = productObject.optJSONArray("allergens_hierarchy");
+
+        if(allergensHierarchy != null && !allergensHierarchy.isEmpty()){
+
+            Boolean isGlutenFree = true;
+
+           for(int i = 0; i< allergensHierarchy.length(); i++){
+               String allergen = allergensHierarchy.optString(i);
+               if(allergen.contains("gluten")){
+                   isGlutenFree = false;
+                   break;
+               }
+           }
+
+           if(isGlutenFree)
+               tags.add(findOrCreateTag("Gluten free"));
+
+        }
+
 
         //eco packaging
 
-        JSONObject packagingObject = productObject.optJSONObject("packaging");
+            JSONObject packagingObject = getNestedObject(productObject, List.of(
+                    "ecoscore_data", "adjustments", "packaging"
+            ));
 
-        
+            String isNotEco = packagingObject.optString("non_recyclable_and_non_biodegradable_materials");
+
+            if( isNotEco != null && isNotEco.equals("0")){
+
+                tags.add(findOrCreateTag("Eco packaging"));
+            }
+
+
         return tags;
+
+    }
+
+
+    //ugly as hell
+    private JSONObject getNestedObject(JSONObject object, List<String> keys){
+
+        if(object == null || keys.isEmpty())
+            return null;
+
+        // get first
+        JSONObject temp = object.optJSONObject(keys.get(0));
+
+        for(int i = 1; i <= keys.size(); i++){
+
+            if(temp == null)
+                break;
+
+            if(i == keys.size()){
+                return temp;
+            }
+
+            temp = temp.optJSONObject(keys.get(i));
+
+        }
+
+        return null;
+    }
+
+
+
+
+
+    private Tag findOrCreateTag(String name){
+
+        Optional<Tag> dbTag = tagRepository.findByName(name);
+
+        if(! dbTag.isPresent()){
+            Tag newTag = new Tag();
+            newTag.setName(name);
+            tagRepository.save(newTag);
+            dbTag = tagRepository.findByName(name);
+        }
+
+        return dbTag.get();
+
 
     }
 

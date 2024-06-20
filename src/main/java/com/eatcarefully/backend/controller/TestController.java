@@ -6,6 +6,7 @@ import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.model.Tag;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
+import com.eatcarefully.backend.repository.TagRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,9 @@ public class TestController {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    @Autowired
+    private TagRepository tagRepository;
+
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
         return ResponseEntity.ok("Hello there");
@@ -44,15 +48,21 @@ public class TestController {
         return ResponseEntity.ok(returnList);
     }
 
-    @GetMapping(path = "/db/products")
+    @GetMapping(path = "/db/products/all")
     public ResponseEntity<List<Product>> getTestProductsDB(){
         List<Product> returnList = productRepository.findAll().stream().toList();
         return ResponseEntity.ok(returnList);
     }
 
-    @GetMapping(path = "/db/ingredients")
+    @GetMapping(path = "/db/ingredients/all")
     public ResponseEntity<List<Ingredient>> getTestIngredientsDB(){
         List<Ingredient> returnList = ingredientRepository.findAll().stream().toList();
+        return ResponseEntity.ok(returnList);
+    }
+
+    @GetMapping(path = "/db/tags/all")
+    public ResponseEntity<List<Tag>> getTagsDB(){
+        List<Tag> returnList = tagRepository.findAll().stream().toList();
         return ResponseEntity.ok(returnList);
     }
 
