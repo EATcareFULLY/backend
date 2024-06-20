@@ -1,8 +1,10 @@
 package com.eatcarefully.backend.service;
 
+import com.eatcarefully.backend.model.Allergen;
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Tag;
+import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
@@ -27,6 +29,8 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final TagRepository tagRepository;
+
+    private final AllergenRepository allergenRepository;
 
     public ResponseEntity<?> getProductDetailsByBarcode(Long barcode) {
         Optional<Product> product = productRepository.findById(barcode); //TODO: maybe change to findProductByBarcode and leave ID auto generated
@@ -91,7 +95,9 @@ public class ProductService {
 
         List<Tag> tags = getTags(productObject);
 
-        Product product = new Product(id, name,nutriscore, brand, frontImageUrl, tags, ingredients);
+        List<Allergen> allergens = getAllergens(productObject);
+
+        Product product = new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients);
 
 
 
@@ -121,6 +127,41 @@ public class ProductService {
             }
         }
         return null;
+    }
+
+    private List<Allergen> getAllergens(JSONObject productObject){
+
+        List<Allergen> allergens = new ArrayList<>();
+
+        JSONArray allergensHierarchy = productObject.optJSONArray("allergens_hierarchy");
+
+        if(allergensHierarchy != null && !allergensHierarchy.isEmpty()){
+
+            for(int i = 0; i < allergensHierarchy.length(); i++){
+
+                String name = formatApiString(allergensHierarchy.getString(i));
+                allergens.add(findOrCreateAllergen(name));
+            }
+        }
+
+
+        return allergens;
+    }
+
+    private Allergen findOrCreateAllergen(String name){
+
+        Optional<Allergen> dbAllergen = allergenRepository.findByName(name);
+
+        if(! dbAllergen.isPresent()){
+            Allergen newAllergen = new Allergen();
+            newAllergen.setName(name);
+            allergenRepository.save(newAllergen);
+            dbAllergen = allergenRepository.findByName(name);
+        }
+
+        return dbAllergen.get();
+
+
     }
 
     private List<Ingredient> getIngredientsList(JSONArray ingredientsArray){

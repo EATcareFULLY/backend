@@ -32,6 +32,7 @@ public class PurchaseService {
                         "Muscle Foood",
                         "https://images.openfoodfacts.org/images/products/505/590/422/3289/front_en.3.400.jpg",
                         List.of(),
+                        List.of(),
                         List.of(ingredient1, ingredient2)
                 ));
         shoppingHistoryRepository.save(new Purchase(null, username, product/*productRepository.findById(purchaseRequest.getBarcode()).orElseThrow()*/, LocalDateTime.now(), purchaseRequest.getQuantity()));

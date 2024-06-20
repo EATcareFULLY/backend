@@ -1,9 +1,7 @@
 package com.eatcarefully.backend.controller;
 
-import com.eatcarefully.backend.model.Ingredient;
-import com.eatcarefully.backend.model.Product;
-import com.eatcarefully.backend.model.Purchase;
-import com.eatcarefully.backend.model.Tag;
+import com.eatcarefully.backend.model.*;
+import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
@@ -31,6 +29,9 @@ public class TestController {
 
     @Autowired
     private TagRepository tagRepository;
+
+    @Autowired
+    private AllergenRepository allergenRepository;
 
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
@@ -63,6 +64,12 @@ public class TestController {
     @GetMapping(path = "/db/tags/all")
     public ResponseEntity<List<Tag>> getTagsDB(){
         List<Tag> returnList = tagRepository.findAll().stream().toList();
+        return ResponseEntity.ok(returnList);
+    }
+
+    @GetMapping(path = "/db/allergens/all")
+    public ResponseEntity<List<Allergen>> getAllergensDB(){
+        List<Allergen> returnList = allergenRepository.findAll().stream().toList();
         return ResponseEntity.ok(returnList);
     }
 
@@ -134,6 +141,11 @@ public class TestController {
 
         );
 
+        List<Allergen> allergens = List.of(
+                new Allergen(0L, "Gluten"),
+                new Allergen(0L, "Peanuts")
+        );
+
         long ingredientId = 55904223289L;
 
 
@@ -144,7 +156,7 @@ public class TestController {
                 "B",
                 "Muscle Foood",
                 "https://images.openfoodfacts.org/images/products/505/590/422/3289/front_en.3.400.jpg",
-                tags, ingredients);
+                tags,allergens, ingredients);
 
 
         return ResponseEntity.ok(product);
@@ -175,27 +187,32 @@ public class TestController {
                 new Tag(5L, "Low Sugar")
         );
 
+        List<Allergen> allergens = List.of(
+                new Allergen(0L, "Gluten"),
+                new Allergen(0L, "Peanuts")
+        );
+
         return List.of(
-                new Product(1L, "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)), List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
-                new Product(2L, "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
-                new Product(3L, "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
-                new Product(4L, "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5))),
-                new Product(5L, "Hot Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(3)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
-                new Product(6L, "Salad Dressing", "A","Brand",null, List.of(tags.get(4), tags.get(2)), List.of(ingredients.get(6), ingredients.get(8), ingredients.get(9))),
-                new Product(7L, "Soy Sauce", "B","Brand",null, List.of(tags.get(0), tags.get(4)), List.of(ingredients.get(7), ingredients.get(1), ingredients.get(3))),
-                new Product(8L, "Teriyaki Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(2)), List.of(ingredients.get(0), ingredients.get(5), ingredients.get(9))),
-                new Product(9L, "Pesto Sauce", "C", "Brand",null,List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(8), ingredients.get(7))),
-                new Product(10L, "Ranch Dressing", "B","Brand",null, List.of(tags.get(2), tags.get(1)), List.of(ingredients.get(2), ingredients.get(3), ingredients.get(6))),
-                new Product(11L, "Caesar Dressing", "Brand",null,"A", List.of(tags.get(4), tags.get(0)), List.of(ingredients.get(1), ingredients.get(9), ingredients.get(0))),
-                new Product(12L, "Thousand Island", "Brand",null,"B", List.of(tags.get(3), tags.get(2)), List.of(ingredients.get(5), ingredients.get(7), ingredients.get(8))),
-                new Product(13L, "Tartar Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
-                new Product(14L, "Honey Mustard", "B","Brand",null, List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(1), ingredients.get(3))),
-                new Product(15L, "Buffalo Sauce", "A","Brand",null,List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(8), ingredients.get(7), ingredients.get(2))),
-                new Product(16L, "Sriracha Sauce", "C","Brand",null, List.of(tags.get(0), tags.get(2)), List.of(ingredients.get(5), ingredients.get(9), ingredients.get(6))),
-                new Product(17L, "Tzatziki Sauce", "B","Brand",null, List.of(tags.get(3), tags.get(0)), List.of(ingredients.get(4), ingredients.get(7), ingredients.get(0))),
-                new Product(18L, "Marinara Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(4)), List.of(ingredients.get(1), ingredients.get(3), ingredients.get(8))),
-                new Product(19L, "Salsa", "C", "Brand",null,List.of(tags.get(2), tags.get(3)), List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
-                new Product(20L, "Guacamole", "A", "Brand",null,List.of(tags.get(4), tags.get(1)), List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
+                new Product(1L, "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)),allergens, List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
+                new Product(2L, "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
+                new Product(3L, "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)),allergens, List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
+                new Product(4L, "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)),allergens, List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5))),
+                new Product(5L, "Hot Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(3)),allergens, List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
+                new Product(6L, "Salad Dressing", "A","Brand",null, List.of(tags.get(4), tags.get(2)),allergens, List.of(ingredients.get(6), ingredients.get(8), ingredients.get(9))),
+                new Product(7L, "Soy Sauce", "B","Brand",null, List.of(tags.get(0), tags.get(4)),allergens, List.of(ingredients.get(7), ingredients.get(1), ingredients.get(3))),
+                new Product(8L, "Teriyaki Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(2)),allergens, List.of(ingredients.get(0), ingredients.get(5), ingredients.get(9))),
+                new Product(9L, "Pesto Sauce", "C", "Brand",null,List.of(tags.get(3), tags.get(0)),allergens, List.of(ingredients.get(4), ingredients.get(8), ingredients.get(7))),
+                new Product(10L, "Ranch Dressing", "B","Brand",null, List.of(tags.get(2), tags.get(1)),allergens, List.of(ingredients.get(2), ingredients.get(3), ingredients.get(6))),
+                new Product(11L, "Caesar Dressing", "Brand",null,"A", List.of(tags.get(4), tags.get(0)),allergens, List.of(ingredients.get(1), ingredients.get(9), ingredients.get(0))),
+                new Product(12L, "Thousand Island", "Brand",null,"B", List.of(tags.get(3), tags.get(2)),allergens, List.of(ingredients.get(5), ingredients.get(7), ingredients.get(8))),
+                new Product(13L, "Tartar Sauce", "C", "Brand",null,List.of(tags.get(1), tags.get(4)),allergens, List.of(ingredients.get(0), ingredients.get(2), ingredients.get(4))),
+                new Product(14L, "Honey Mustard", "B","Brand",null, List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(6), ingredients.get(1), ingredients.get(3))),
+                new Product(15L, "Buffalo Sauce", "A","Brand",null,List.of(tags.get(4), tags.get(1)),allergens, List.of(ingredients.get(8), ingredients.get(7), ingredients.get(2))),
+                new Product(16L, "Sriracha Sauce", "C","Brand",null, List.of(tags.get(0), tags.get(2)),allergens, List.of(ingredients.get(5), ingredients.get(9), ingredients.get(6))),
+                new Product(17L, "Tzatziki Sauce", "B","Brand",null, List.of(tags.get(3), tags.get(0)),allergens, List.of(ingredients.get(4), ingredients.get(7), ingredients.get(0))),
+                new Product(18L, "Marinara Sauce", "A","Brand",null, List.of(tags.get(1), tags.get(4)),allergens, List.of(ingredients.get(1), ingredients.get(3), ingredients.get(8))),
+                new Product(19L, "Salsa", "C", "Brand",null,List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
+                new Product(20L, "Guacamole", "A", "Brand",null,List.of(tags.get(4), tags.get(1)), allergens,List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
         );
     }
 

@@ -34,6 +34,9 @@ public class Product {
     @ManyToMany
     private List<Tag> tags;
 
+    @ManyToMany
+    private List<Allergen> allergens;
+
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Ingredient> ingredients;
 }
