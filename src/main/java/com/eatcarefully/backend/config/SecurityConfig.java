@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login((oauth2Login) -> oauth2Login
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("http://localhost:3000/", true)
                 )
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
