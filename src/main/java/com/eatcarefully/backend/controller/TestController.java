@@ -5,9 +5,9 @@ import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,19 +18,15 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/test")
-
+@AllArgsConstructor
 public class TestController {
 
-    @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
     private IngredientRepository ingredientRepository;
 
-    @Autowired
     private TagRepository tagRepository;
 
-    @Autowired
     private AllergenRepository allergenRepository;
 
     @GetMapping(path = "/hello")
@@ -41,6 +37,13 @@ public class TestController {
     @GetMapping(path = "/secure")
     public ResponseEntity<String> secureHelloWorld(){
         return ResponseEntity.ok("Hello from secure endpoint");
+    }
+
+    // have to decide if we need have role based access control
+    @GetMapping(path = "/helloAdmin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> helloAdmin(){
+        return ResponseEntity.ok("Hello there admin");
     }
 
     @GetMapping(path = "/products")
@@ -134,10 +137,17 @@ public class TestController {
 
         );
 
+        Product product = generateTestProductFromIngredients(ingredients);
+
+
+        return ResponseEntity.ok(product);
+    }
+
+    private static Product generateTestProductFromIngredients(List<Ingredient> ingredients) {
         List<Tag> tags = List.of(
-                new Tag(0l, "Not vegan"),
-                new Tag(0l, "Not vegetarian"),
-                new Tag(0l, "May contain gluten")
+                new Tag(0L, "Not vegan"),
+                new Tag(0L, "Not vegetarian"),
+                new Tag(0L, "May contain gluten")
 
         );
 
@@ -150,19 +160,14 @@ public class TestController {
 
 
         //score is nutriscore
-        Product product = new Product(
+        return new Product(
                 ingredientId,
                 "High Protein Chicken & Chorizo Paella",
                 "B",
                 "Muscle Foood",
                 "https://images.openfoodfacts.org/images/products/505/590/422/3289/front_en.3.400.jpg",
                 tags,allergens, ingredients);
-
-
-        return ResponseEntity.ok(product);
     }
-    
-
 
 
     private List<Product> generateListOfProducts() {

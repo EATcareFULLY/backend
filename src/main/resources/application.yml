@@ -14,7 +14,7 @@ spring:
       ddl-auto: update
     show-sql: true
 
-  # h2 as database
+  #TODO: could be useful for future testing
 #  datasource:
 #    url: jdbc:h2:mem:testdb
 #    driverClassName: org.h2.Driver
@@ -24,27 +24,45 @@ spring:
 #    database-platform: org.hibernate.dialect.H2Dialect
 
 
+
   security:
     oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: backend_client
-            client-secret: HtGU6TxlSfOz2rKBnhEi9XRk2rLJtKJw
-            authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/keycloak
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          keycloak:
-            authorization-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/auth
-            token-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/token
-            user-info-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/userinfo
-            jwk-set-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/certs
-            user-name-attribute: preferred_username
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/eat-carefully
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
+
+jwt:
+  auth:
+    converter:
+      resource-id: backend_client
+      principle-attribute: preferred_username
 
 server:
   port: 8081
+
+
+
+
+
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          keycloak:
+#            client-id: backend_client
+#            client-secret: HtGU6TxlSfOz2rKBnhEi9XRk2rLJtKJw
+#            authorization-grant-type: authorization_code
+#            redirect-uri: http://localhost:8081/login/oauth2/code/keycloak
+#            scope:
+#              - openid
+#              - profile
+#              - email
+#        provider:
+#          keycloak:
+#            authorization-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/auth
+#            token-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/token
+#            user-info-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/userinfo
+#            jwk-set-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/certs
+#            user-name-attribute: preferred_username
