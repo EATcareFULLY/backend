@@ -83,7 +83,7 @@ public class TestController {
 
         for (int i = 0; i < 20; i++) {
             Product product = products.get(i % products.size());
-            Purchase purchase = new Purchase((long) i, "user", product, LocalDateTime.now(),i%4);
+            Purchase purchase = new Purchase((long) i, "user", LocalDateTime.now(),  List.of());
             mockPurchases.add(purchase);
         }
         return ResponseEntity.ok(mockPurchases);

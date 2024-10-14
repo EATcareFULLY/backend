@@ -6,26 +6,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Purchase {
+@Getter
+@Setter
+public class PurchaseItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-
-    private LocalDateTime purchaseDate;
-
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "purchase_id")
-    private List<PurchaseItem> purchasedItems;
+    private Purchase purchase;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    private int quantity;
 
 }

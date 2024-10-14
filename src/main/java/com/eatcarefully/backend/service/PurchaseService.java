@@ -35,7 +35,7 @@ public class PurchaseService {
                         List.of(),
                         List.of(ingredient1, ingredient2)
                 ));
-        shoppingHistoryRepository.save(new Purchase(null, username, product/*productRepository.findById(purchaseRequest.getBarcode()).orElseThrow()*/, LocalDateTime.now(), purchaseRequest.getQuantity()));
+        shoppingHistoryRepository.save(new Purchase(null, username/*productRepository.findById(purchaseRequest.getBarcode()).orElseThrow()*/, LocalDateTime.now(), List.of()));
     }
 
     public List<Purchase> getWholePurchaseHistory(String username) {
