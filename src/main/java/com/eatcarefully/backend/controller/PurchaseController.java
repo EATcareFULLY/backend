@@ -2,6 +2,7 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.service.PurchaseService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +25,16 @@ public class PurchaseController {
         return ResponseEntity.ok("Purchase added successfully");
     }
 
+
+
     @GetMapping("/all")
+    @Cacheable(value = "purchases_resp")
     public ResponseEntity<List<Purchase>> getAllPurchases(Principal principal) {
         return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(principal.getName()));
     }
 
     @GetMapping("/range")
+    @Cacheable(value = "purchases_resp")
     public List<Purchase> getPurchasesByDateRange(
             Principal principal,
             @RequestParam("startDate") LocalDateTime startDate,
