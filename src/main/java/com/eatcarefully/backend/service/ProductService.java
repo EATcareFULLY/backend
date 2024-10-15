@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,8 @@ public class ProductService {
 
     private final AllergenRepository allergenRepository;
 
+
+    @Cacheable(cacheNames = "products", key = "#barcode")
     public ResponseEntity<?> getProductDetailsByBarcode(Long barcode) {
         Optional<Product> product = productRepository.findById(barcode); //TODO: maybe change to findProductByBarcode and leave ID auto generated
         if(product.isEmpty()) {
@@ -201,6 +204,7 @@ public class ProductService {
         return allergens;
     }
 
+    @Cacheable( cacheNames = "allergens", key = "#name")
     private Allergen findOrCreateAllergen(String name){
 
         Optional<Allergen> dbAllergen = allergenRepository.findByName(name);
@@ -403,6 +407,7 @@ public class ProductService {
 
 
 
+    @Cacheable(cacheNames = "tags", key="#name")
     private Tag findOrCreateTag(String name){
 
         Optional<Tag> dbTag = tagRepository.findByName(name);
