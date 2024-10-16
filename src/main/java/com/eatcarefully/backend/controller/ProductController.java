@@ -18,7 +18,7 @@ public class ProductController {
 
     @GetMapping("/{barcode}")
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
-    public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable Long barcode) {
+    public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable String barcode) {
 
 
         return productService.getProductDetailsByBarcode(barcode);

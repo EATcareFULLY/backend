@@ -34,7 +34,7 @@ public class ProductJsonFactory {
         if(productObject ==  null)
             throw new NoSuchFieldException();
 
-        Long id = json.optLong("code");
+        String id = json.optString("code");
         String name = getProductName(productObject);
         String brand = productObject.optString("brands");
 

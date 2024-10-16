@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class PurchaseRequest {
-    private Long barcode;
+    private String barcode;
     private int quantity;
 }
