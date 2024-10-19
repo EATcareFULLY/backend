@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class TestController {
 
         for (int i = 0; i < 20; i++) {
             Product product = products.get(i % products.size());
-            Purchase purchase = new Purchase((long) i, "user", LocalDateTime.now(),  List.of());
+            Purchase purchase = new Purchase((long) i, "user", LocalDate.now(),  List.of());
             mockPurchases.add(purchase);
         }
         return ResponseEntity.ok(mockPurchases);

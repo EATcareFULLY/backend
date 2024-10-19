@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class PurchaseController {
     @Cacheable(value = "purchases_resp")
     public List<Purchase> getPurchasesByDateRange(
             Principal principal,
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
         return shoppingService.getNarrowedPurchaseHistory(principal.getName(), startDate, endDate);
     }
 }

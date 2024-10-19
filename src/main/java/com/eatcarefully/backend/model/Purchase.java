@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,10 +25,23 @@ public class Purchase {
 
     private String username;
 
-    private LocalDateTime purchaseDate;
+    private LocalDate purchaseDate;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "purchase_id")
-    private List<PurchaseItem> purchasedItems;
+    private List<PurchaseItem> purchasedItems = new ArrayList<>();
+
+
+    public void addPurchaseItem(PurchaseItem purchaseItem){
+
+        if(purchaseItem != null){
+            purchaseItem.setPurchase(this);
+            this.purchasedItems.add(purchaseItem);
+        }
+
+    }
+
+
+
 
 }

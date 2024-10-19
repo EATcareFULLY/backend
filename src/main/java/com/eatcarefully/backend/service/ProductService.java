@@ -98,6 +98,18 @@ public class ProductService {
     }
 
 
+    public Product getProductByBarcode(String barcode){
+
+        Optional<Product> product = productRepository.findById(barcode);
+
+        if (product.isPresent())
+                return product.get();
+        else
+            return null;
+
+    }
+
+
 
 
 
