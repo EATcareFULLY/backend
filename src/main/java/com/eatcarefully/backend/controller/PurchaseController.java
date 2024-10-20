@@ -4,15 +4,15 @@ import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.service.PurchaseService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/purchases")   //TODO: add global /api/v1 prefix
+@RequestMapping("/purchases")
 public class PurchaseController {
     private final PurchaseService shoppingService;
 
@@ -21,8 +21,8 @@ public class PurchaseController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> addPurchase(Principal principal, @RequestBody PurchaseRequest purchaseRequest) {
-        shoppingService.addPurchase(principal.getName(), purchaseRequest);
+    public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
+        shoppingService.addPurchase(jwt, purchaseRequest);
         return ResponseEntity.ok("Purchase added successfully");
     }
 
@@ -30,16 +30,16 @@ public class PurchaseController {
 
     @GetMapping("/all")
     @Cacheable(value = "purchases_resp")
-    public ResponseEntity<List<Purchase>> getAllPurchases(Principal principal) {
-        return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(principal.getName()));
+    public ResponseEntity<List<Purchase>> getAllPurchases(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(jwt));
     }
 
     @GetMapping("/range")
     @Cacheable(value = "purchases_resp")
     public List<Purchase> getPurchasesByDateRange(
-            Principal principal,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate) {
-        return shoppingService.getNarrowedPurchaseHistory(principal.getName(), startDate, endDate);
+        return shoppingService.getNarrowedPurchaseHistory(jwt, startDate, endDate);
     }
 }

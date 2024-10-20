@@ -9,7 +9,7 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/session")
-public class SessionController {
+public class SessionController {    //TODO: cleanup
 
     @GetMapping("/logout")
     public String logout() {

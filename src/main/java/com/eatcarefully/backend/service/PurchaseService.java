@@ -6,10 +6,10 @@ import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +17,14 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PurchaseService {
 
+    private static final String USERNAME_CLAIM = "preferred_username";
     private final IngredientRepository ingredientRepository;
     private final ProductRepository productRepository;
     private final PurchaseRepository shoppingHistoryRepository;
     private final ProductService productService;
 
-    public void addPurchase(String username, PurchaseRequest purchaseRequest) {
+    public void addPurchase(Jwt jwt, PurchaseRequest purchaseRequest) {
+        String username = getUsernameFromToken(jwt);
 
         // get or create purchase
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
@@ -67,11 +69,17 @@ public class PurchaseService {
 
 
 
-    public List<Purchase> getWholePurchaseHistory(String username) {
+    public List<Purchase> getWholePurchaseHistory(Jwt jwt) {
+        String username = getUsernameFromToken(jwt);
         return shoppingHistoryRepository.findByUsername(username);
     }
 
-    public List<Purchase> getNarrowedPurchaseHistory(String username, LocalDate start, LocalDate end) {
+    public List<Purchase> getNarrowedPurchaseHistory(Jwt jwt, LocalDate start, LocalDate end) {
+        String username = getUsernameFromToken(jwt);
         return shoppingHistoryRepository.findByUsernameAndPurchaseDateBetween(username, start, end);
+    }
+
+    private String getUsernameFromToken(Jwt jwt){
+        return jwt.getClaim(USERNAME_CLAIM);
     }
 }
