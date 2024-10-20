@@ -17,7 +17,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final JwtAuthConverter jwtAuthConverter;
+    private final JwtAuthConverter jwtAuthConverter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,9 +28,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> {}
-//                                jwt.jwtAuthenticationConverter(jwtAuthConverter)
-                        )
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter))
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(STATELESS)
