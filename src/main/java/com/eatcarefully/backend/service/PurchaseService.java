@@ -1,11 +1,14 @@
 package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.controller.PurchaseRequest;
+import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.model.*;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +32,8 @@ public class PurchaseService {
         // get or create purchase
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
 
-
         // get product
         Product product = productService.getProductByBarcode(purchaseRequest.getBarcode());
-
 
         // alter and add purchase item
         if( product != null){
@@ -41,42 +42,36 @@ public class PurchaseService {
             purchaseItem.setQuantity(purchaseRequest.getQuantity());
             purchase.addPurchaseItem(purchaseItem);
             shoppingHistoryRepository.save(purchase);
-
         }
-
-
-
     }
 
     public Purchase getOrCreatePurchase(String username, LocalDate purchaseDate){
 
         Optional<Purchase> purchase = shoppingHistoryRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
 
-        if(! purchase.isPresent()){
+        if(purchase.isEmpty()){
             Purchase newPurchase = new Purchase();
             newPurchase.setUsername(username);
             newPurchase.setPurchaseDate(LocalDate.now());
             shoppingHistoryRepository.save(newPurchase);
             return newPurchase;
-
-        }
-        else{
+        } else {
             return purchase.get();
         }
-
     }
 
-
-
-
-    public List<Purchase> getWholePurchaseHistory(Jwt jwt) {
+    public List<PurchaseDTO> getWholePurchaseHistory(Jwt jwt) {
         String username = getUsernameFromToken(jwt);
-        return shoppingHistoryRepository.findByUsername(username);
+        List<Purchase> purchases = shoppingHistoryRepository.findByUsername(username);
+        return purchases.stream()
+                .map(Purchase::toDTO)
+                .toList();
     }
 
-    public List<Purchase> getNarrowedPurchaseHistory(Jwt jwt, LocalDate start, LocalDate end) {
+    public Page<PurchaseDTO> getNarrowedPurchaseHistory(Jwt jwt, LocalDate start, LocalDate end, Pageable pageable) {
         String username = getUsernameFromToken(jwt);
-        return shoppingHistoryRepository.findByUsernameAndPurchaseDateBetween(username, start, end);
+        Page<Purchase> purchasesPage = shoppingHistoryRepository.findByUsernameAndPurchaseDateBetween(username, start, end, pageable);
+        return purchasesPage.map(Purchase::toDTO);
     }
 
     private String getUsernameFromToken(Jwt jwt){

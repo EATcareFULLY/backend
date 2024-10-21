@@ -1,8 +1,12 @@
 package com.eatcarefully.backend.controller;
 
-import com.eatcarefully.backend.model.Purchase;
+import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -30,16 +34,28 @@ public class PurchaseController {
 
     @GetMapping("/all")
     @Cacheable(value = "purchases_resp")
-    public ResponseEntity<List<Purchase>> getAllPurchases(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<List<PurchaseDTO>> getAllPurchases(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(shoppingService.getWholePurchaseHistory(jwt));
     }
 
     @GetMapping("/range")
-    @Cacheable(value = "purchases_resp")
-    public List<Purchase> getPurchasesByDateRange(
+    @Cacheable(value = "purchases_resp") //TODO: caching based on pageable
+    public Page<PurchaseDTO> getPurchasesByDateRange(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestParam("startDate") LocalDate startDate,
-            @RequestParam("endDate") LocalDate endDate) {
-        return shoppingService.getNarrowedPurchaseHistory(jwt, startDate, endDate);
+            @RequestParam(name = "startDate") LocalDate startDate,
+            @RequestParam(name = "endDate") LocalDate endDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "desc") String sort) {
+
+        Sort.Direction direction = Sort.Direction.ASC;
+        String property = "purchaseDate";
+
+        if (sort.equalsIgnoreCase("desc")) {
+            direction = Sort.Direction.DESC;
+        }
+        Pageable pageable = PageRequest.of(page, size, direction, property);
+
+        return shoppingService.getNarrowedPurchaseHistory(jwt, startDate, endDate, pageable);
     }
 }

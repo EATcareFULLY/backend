@@ -1,14 +1,13 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.PurchaseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,12 @@ public class Purchase {
 
     }
 
-
+    public PurchaseDTO toDTO(){
+        return new PurchaseDTO(
+                this.getPurchaseDate(),
+                this.getPurchasedItems().stream().map(PurchaseItem::toDTO).toList()
+        );
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.PurchaseItemDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,5 +27,13 @@ public class PurchaseItem {
     private Product product;
 
     private int quantity;
+
+
+    public PurchaseItemDTO toDTO(){
+        return new PurchaseItemDTO(
+                this.getProduct(),
+                this.getQuantity()
+        );
+    }
 
 }
