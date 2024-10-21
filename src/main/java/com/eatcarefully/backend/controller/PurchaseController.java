@@ -2,6 +2,8 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.service.PurchaseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/purchases")
+@Tag(name = "Shopping History", description = "API for managing purchase history")
 public class PurchaseController {
     private final PurchaseService shoppingService;
 
@@ -40,6 +43,7 @@ public class PurchaseController {
 
     @GetMapping("/range")
     @Cacheable(value = "purchases_resp") //TODO: caching based on pageable
+    @Operation(summary = "Get purchases by date range")
     public Page<PurchaseDTO> getPurchasesByDateRange(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam(name = "startDate") LocalDate startDate,
