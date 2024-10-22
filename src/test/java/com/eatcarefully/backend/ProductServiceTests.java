@@ -9,8 +9,6 @@ import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
 import com.eatcarefully.backend.service.ProductService;
-import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +30,6 @@ public class ProductServiceTests {
     private AllergenRepository allergenRepository;
     
 
-    @Before
     public void setUp(){
 
         List<Tag> tags = List.of(
@@ -63,10 +60,10 @@ public class ProductServiceTests {
         );
 
          List<Product> products =  List.of(
-                new Product(1L, "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)),allergens, List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
-                new Product(2L, "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
-                new Product(3L, "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)),allergens, List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
-                new Product(4L, "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)),allergens, List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5)))
+                new Product("1L", "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)),allergens, List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
+                new Product("2L", "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
+                new Product("3L", "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)),allergens, List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
+                new Product("4L", "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)),allergens, List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5)))
 
         );
 

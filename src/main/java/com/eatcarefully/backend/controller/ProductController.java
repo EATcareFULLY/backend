@@ -22,8 +22,16 @@ public class ProductController {
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
     public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable String barcode) {
 
+        Product product = productService.getProductDetailsByBarcode(barcode);
 
-        return productService.getProductDetailsByBarcode(barcode);
+        if(product == null) {
+            Product temp = new Product();
+            temp.setId("0");
+            return ResponseEntity.ok(temp);
+        }
+        else
+            return ResponseEntity.ok(product);
+
     }
 
     // mock endpoint for recommendation system
@@ -56,6 +64,9 @@ public class ProductController {
     public ResponseEntity<?> getLabelEvaluation(@RequestBody Map<String, String> request){
 
         String labelText = request.get("labelText");
+
+        if(labelText.isEmpty() || labelText.isBlank())
+            return ResponseEntity.badRequest().build();
 
         String eval = labelText + ": Mock eval response";
 

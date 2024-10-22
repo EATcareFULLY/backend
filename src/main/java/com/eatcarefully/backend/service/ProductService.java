@@ -30,8 +30,8 @@ public class ProductService {
     // not for processing json response
 
     @Cacheable(cacheNames = "products", key = "#barcode")
-    public ResponseEntity<?> getProductDetailsByBarcode(String barcode) {
-        Optional<Product> product = productRepository.findById(barcode); //TODO: maybe change to findProductByBarcode and leave ID auto generated
+    public Product getProductDetailsByBarcode(String barcode) {
+        Optional<Product> product = productRepository.findById(barcode);
         if(product.isEmpty()) {
 
 
@@ -40,23 +40,21 @@ public class ProductService {
                 Product productFromJson = productJsonFactory.parseJSONToProduct(openFoodFactAPIResponse);
 
                 if(productFromJson == null){
-                    Product temp = new Product();
-                    temp.setId("0");
-                    return ResponseEntity.ok(temp);
+                    return null;
                 }
                 else {
                     productRepository.save(productFromJson);
-                    return ResponseEntity.ok(productFromJson);
+                    return productFromJson;
                 }
 
 
             } catch (IOException | InterruptedException | NoSuchFieldException e) {
-                return ResponseEntity.notFound().build();
+                return null;
             }
 
 
         } else {
-            return ResponseEntity.ok(product.get());
+            return product.get();
         }
     }
 
