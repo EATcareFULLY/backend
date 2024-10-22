@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -29,7 +31,7 @@ public class PurchaseController {
 
     @PostMapping()
     public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
-        shoppingService.addPurchase(jwt, purchaseRequest);
+        shoppingService.addPurchaseItem(jwt, purchaseRequest);
         return ResponseEntity.ok("Purchase added successfully");
     }
 
@@ -62,4 +64,23 @@ public class PurchaseController {
 
         return shoppingService.getNarrowedPurchaseHistory(jwt, startDate, endDate, pageable);
     }
+
+    @DeleteMapping()
+    public ResponseEntity<?> removePurchaseItem(@AuthenticationPrincipal Jwt jwt,
+                                                     @RequestBody RemovePurchaseItemDTO removeRequest) {
+
+        if(removeRequest.getQuantity() <= 0){
+            return ResponseEntity.badRequest().build();
+        }
+        else{
+
+            if(shoppingService.removePurchaseItem(jwt, removeRequest.getBarcode(),removeRequest.getPurchaseDate(), removeRequest.getQuantity()))
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            else
+                return ResponseEntity.badRequest().build();
+
+        }
+
+    }
+
 }

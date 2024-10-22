@@ -26,7 +26,7 @@ public class PurchaseService {
     private final PurchaseRepository shoppingHistoryRepository;
     private final ProductService productService;
 
-    public void addPurchase(Jwt jwt, PurchaseRequest purchaseRequest) {
+    public void addPurchaseItem(Jwt jwt, PurchaseRequest purchaseRequest) {
         String username = getUsernameFromToken(jwt);
 
         // get or create purchase
@@ -77,4 +77,48 @@ public class PurchaseService {
     private String getUsernameFromToken(Jwt jwt){
         return jwt.getClaim(USERNAME_CLAIM);
     }
+
+
+
+    public Boolean removePurchaseItem(Jwt jwt, String barcode, LocalDate purchaseDate, int quantity){
+
+        String username = getUsernameFromToken(jwt);
+
+        // check if purchase exists
+        Optional<Purchase> purchaseOpt = shoppingHistoryRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
+
+        if( purchaseOpt.isEmpty())
+            // purchase not found
+            return false;
+
+        // check if purchase item exists
+        Optional<PurchaseItem> itemOpt = purchaseOpt.get().getPurchaseItemByBarcode(barcode);
+
+        if(itemOpt.isEmpty())
+            //purchaseItem not found
+            return false;
+
+        PurchaseItem item = itemOpt.get();
+        Purchase purchase = purchaseOpt.get();
+
+        if(quantity > item.getQuantity())
+            return false;
+
+        if(quantity == item.getQuantity()){
+            // remove object
+            purchase.removePurchaseItem(item);
+        }
+        else{
+            item.setQuantity(item.getQuantity() - quantity);
+        }
+
+        shoppingHistoryRepository.save(purchase);
+        return true;
+
+    }
+
+
 }
+
+
+

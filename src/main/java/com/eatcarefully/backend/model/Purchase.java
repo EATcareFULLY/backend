@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -45,6 +46,23 @@ public class Purchase {
                 this.getPurchaseDate(),
                 this.getPurchasedItems().stream().map(PurchaseItem::toDTO).toList()
         );
+    }
+
+
+    public Optional<PurchaseItem> getPurchaseItemByBarcode(String barcode){
+
+        return this.purchasedItems.stream()
+                .filter( item -> item.getProduct().getId().equals(barcode))
+                .findFirst();
+    }
+
+
+    public Boolean removePurchaseItem(PurchaseItem item){
+
+        if(item == null)
+            return false;
+        return this.purchasedItems.remove(item);
+
     }
 
 
