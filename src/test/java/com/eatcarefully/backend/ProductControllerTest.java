@@ -4,16 +4,13 @@ package com.eatcarefully.backend;
 import com.eatcarefully.backend.controller.ProductController;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
@@ -41,7 +38,7 @@ public class ProductControllerTest {
         String barcode = "11111111";
         Product product = new Product(barcode, "test","test","test","test", null, null, null);
 
-        when(productService.getProductDetailsByBarcode(barcode)).thenReturn(product);
+        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode)).thenReturn(product);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -56,7 +53,7 @@ public class ProductControllerTest {
 
         String barcode = "not_valid";
 
-        when(productService.getProductDetailsByBarcode(barcode)).thenReturn(null);
+        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode)).thenReturn(null);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -75,7 +72,7 @@ public class ProductControllerTest {
         String barcode = "11111111";
         Product product = new Product(barcode, "test","test","test","test", null, null, null);
 
-        when(productService.getProductByBarcode(barcode)).thenReturn(product);
+        when(productService.getProductByBarcodeFromDatabase(barcode)).thenReturn(product);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}/recommend", barcode)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -91,7 +88,7 @@ public class ProductControllerTest {
 
         String barcode = "not_valid";
 
-        when(productService.getProductByBarcode(barcode)).thenReturn(null);
+        when(productService.getProductByBarcodeFromDatabase(barcode)).thenReturn(null);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}/recommend", barcode)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))

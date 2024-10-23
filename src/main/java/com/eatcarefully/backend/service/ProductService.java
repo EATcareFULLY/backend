@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,8 +28,10 @@ public class ProductService {
 
     // not for processing json response
 
+    // this method will try to fetch product from OpenFoodFacts if not found in database
+
     @Cacheable(cacheNames = "products", key = "#barcode")
-    public Product getProductDetailsByBarcode(String barcode) {
+    public Product getProductByBarcodeFromDatabaseOrOpenFoodFacts(String barcode) {
         Optional<Product> product = productRepository.findById(barcode);
         if(product.isEmpty()) {
 
@@ -96,14 +97,13 @@ public class ProductService {
     }
 
 
-    public Product getProductByBarcode(String barcode){
+    // this method
+
+    public Product getProductByBarcodeFromDatabase(String barcode){
 
         Optional<Product> product = productRepository.findById(barcode);
 
-        if (product.isPresent())
-                return product.get();
-        else
-            return null;
+        return product.orElse(null);
 
     }
 

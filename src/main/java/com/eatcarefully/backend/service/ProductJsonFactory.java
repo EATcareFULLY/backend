@@ -21,8 +21,6 @@ public class ProductJsonFactory {
     private AllergenService allergenService;
 
 
-    // make it singleton??
-
     public Product parseJSONToProduct(JSONObject json) throws NoSuchFieldException {
 
         if(json.isEmpty() || json == null){

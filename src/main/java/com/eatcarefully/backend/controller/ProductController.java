@@ -22,7 +22,7 @@ public class ProductController {
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
     public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable String barcode) {
 
-        Product product = productService.getProductDetailsByBarcode(barcode);
+        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode);
 
         if(product == null) {
             Product temp = new Product();
@@ -39,7 +39,7 @@ public class ProductController {
     @GetMapping("/{barcode}/recommend")
     public ResponseEntity<?> getProductRecommendationByBarcode(@PathVariable String barcode){
 
-        Product product = productService.getProductByBarcode(barcode);
+        Product product = productService.getProductByBarcodeFromDatabase(barcode);
 
         //mock products to recommend
 

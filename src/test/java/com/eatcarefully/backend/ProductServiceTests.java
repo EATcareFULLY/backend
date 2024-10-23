@@ -1,95 +1,157 @@
 package com.eatcarefully.backend;
 
-
-import com.eatcarefully.backend.model.Allergen;
-import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
-import com.eatcarefully.backend.model.Tag;
-import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
-import com.eatcarefully.backend.repository.TagRepository;
+import com.eatcarefully.backend.service.ProductJsonFactory;
 import com.eatcarefully.backend.service.ProductService;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
+import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Optional;
 
-@TestConfiguration
+import static org.mockito.Mockito.when;
+
+
+@SpringJUnitConfig
+@Import(ProductServiceTests.ProductServiceTestContextConfiguration.class)
 public class ProductServiceTests {
 
-    @MockBean
-    private ProductRepository productRepository;
 
-    @MockBean
-    private TagRepository tagRepository;
+    @Autowired
+    private ProductService productService;
 
-    @MockBean
-    private AllergenRepository allergenRepository;
-    
+    @Mock
+    private static ProductRepository productRepository;
 
-    public void setUp(){
+    @Mock
+    private static ProductJsonFactory productJsonFactory;
 
-        List<Tag> tags = List.of(
-                new Tag(0L, "Not vegan"),
-                new Tag(0L, "Not vegetarian"),
-                new Tag(0L, "May contain gluten")
+    private static final String VALID_BARCODE_NOT_IN_DB = "11111111";
 
-        );
-        
-        Tag tag = new Tag(0L,"Not vegan");
+    private static final String VALID_BARCODE_IN_DB = "22222222";
+    private static final String INVALID_BARCODE = "notValid";
 
-        List<Allergen> allergens = List.of(
-                new Allergen(0L, "Gluten"),
-                new Allergen(0L, "Peanuts")
-        );
-
-        List<Ingredient> ingredients = List.of(
-                new Ingredient(1L, "Tomato Paste", "Concentrated tomato paste", 20.5f),
-                new Ingredient(2L, "Sugar", "White granulated sugar", 10.0f),
-                new Ingredient(3L, "Salt", "Table salt", 5.0f),
-                new Ingredient(4L, "Vinegar", "Distilled white vinegar", 7.0f),
-                new Ingredient(5L, "Spices", "Mixed spices", 1.5f),
-                new Ingredient(6L, "Water", "Filtered water", 50.0f),
-                new Ingredient(7L, "Garlic", "Minced garlic", 2.0f),
-                new Ingredient(8L, "Onion", "Diced onion", 3.0f),
-                new Ingredient(9L, "Oil", "Vegetable oil", 4.0f),
-                new Ingredient(10L, "Lemon Juice", "Fresh lemon juice", 2.5f)
-        );
-
-         List<Product> products =  List.of(
-                new Product("1L", "Ketchup", "C", "Brand",null, List.of(tags.get(0), tags.get(1)),allergens, List.of(ingredients.get(0), ingredients.get(1), ingredients.get(2), ingredients.get(3))),
-                new Product("2L", "Mustard French", "B","Brand",null, List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(4), ingredients.get(5), ingredients.get(6))),
-                new Product("3L", "Mayonnaise Light", "A","Brand",null, List.of(tags.get(4), tags.get(1)),allergens, List.of(ingredients.get(7), ingredients.get(8), ingredients.get(9))),
-                new Product("4L", "Barbecue Sauce","Brand",null, "B", List.of(tags.get(0), tags.get(2)),allergens, List.of(ingredients.get(1), ingredients.get(3), ingredients.get(5)))
-
-        );
+    @TestConfiguration
+    static class ProductServiceTestContextConfiguration{
 
 
-         Mockito.when(tagRepository.findAll()).thenReturn(tags);
-         Mockito.when(tagRepository.findByName("TagDB")).thenReturn(Optional.ofNullable(tag));
-        Mockito.when(tagRepository.findByName("TagNoDB")).thenReturn(Optional.ofNullable(null));
+        @Bean
+        public ProductService productService(){
+            return new ProductService(productRepository, productJsonFactory);
+        }
+
 
     }
 
 
-//    @Test
-//    public String formatApiStringShouldReturnNull(){
-//
-//
-//        //given
-//        String nullString = null;
-//
-//
-//        //when
-//
-//
-//
-//        //then
-//
-//    }
+    @BeforeEach
+    public void setUp() throws NoSuchFieldException {
+
+        Product product = new Product();
+        product.setId(VALID_BARCODE_IN_DB);
+
+        Optional<Product> emptyProductOptional = Optional.empty();
+        Optional<Product> productOptional = Optional.of(product);
+        when(productRepository.findById(INVALID_BARCODE)).thenReturn(emptyProductOptional);
+        when(productRepository.findById(VALID_BARCODE_NOT_IN_DB)).thenReturn(emptyProductOptional);
+        when(productRepository.findById(VALID_BARCODE_IN_DB)).thenReturn(productOptional);
+        when(productJsonFactory.parseJSONToProduct(Mockito.any(JSONObject.class))).thenAnswer(
+                new Answer<Product>(){
+
+                    @Override
+                    public Product answer(InvocationOnMock invocation) throws Throwable{
+
+                        JSONObject json = invocation.getArgument(0, JSONObject.class);
+
+                        if(json.has("code") && json.getString("code").equals(VALID_BARCODE_NOT_IN_DB)){
+
+                            return product;
+                        }
+                        else
+                            return null;
+
+                    }
+
+                });
+
+    }
+
+
+    // only fetching from database
+
+    @Test
+    public void Should_ReturnNull_When_ProductNotFoundInDatabase(){
+
+
+        Product product = productService.getProductByBarcodeFromDatabase(INVALID_BARCODE);
+
+        assertTrue(product == null);
+
+    }
+
+
+    @Test
+    public void Should_ReturnProduct_When_ProductFoundInDatabase(){
+
+        Product product = productService.getProductByBarcodeFromDatabase(VALID_BARCODE_IN_DB);
+
+        assertFalse(product == null);
+        assertTrue(product.getId().equals(VALID_BARCODE_IN_DB));
+
+
+    }
+
+    //fetching from database or OpenFoodFacts
+
+    @Test
+    public void Should_ReturnNull_When_ProductIsNotFoundInDatabaseNorOpenFoodFacts(){
+
+        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(INVALID_BARCODE);
+
+        assertTrue(product == null);
+
+    }
+
+
+    @Test
+    public void Should_ReturnProduct_When_ProductIsFoundInDatabaseNotOpenFoodFacts(){
+
+        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(VALID_BARCODE_IN_DB);
+
+        assertFalse(product == null);
+        assertTrue(product.getId().equals(VALID_BARCODE_IN_DB));
+
+    }
+
+
+    @Test
+    public void Should_ReturnProduct_When_ProductIsNotFoundInDatabaseButInOpenFoodFacts(){
+
+        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(VALID_BARCODE_NOT_IN_DB);
+
+        assertFalse(product == null);
+
+    }
+
+
+
+
+
 
 
 

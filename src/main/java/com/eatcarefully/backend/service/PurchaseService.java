@@ -33,7 +33,7 @@ public class PurchaseService {
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
 
         // get product
-        Product product = productService.getProductByBarcode(purchaseRequest.getBarcode());
+        Product product = productService.getProductByBarcodeFromDatabase(purchaseRequest.getBarcode());
 
         // alter and add purchase item
         if( product != null){
