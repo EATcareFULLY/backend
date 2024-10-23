@@ -37,11 +37,24 @@ public class PurchaseService {
 
         // alter and add purchase item
         if( product != null){
-            PurchaseItem purchaseItem = new PurchaseItem();
-            purchaseItem.setProduct(product);
-            purchaseItem.setQuantity(purchaseRequest.getQuantity());
-            purchase.addPurchaseItem(purchaseItem);
+
+            Optional<PurchaseItem> itemOpt = purchase.getPurchaseItemByBarcode(purchaseRequest.getBarcode());
+
+            if(itemOpt.isPresent()){
+
+                PurchaseItem item = itemOpt.get();
+                item.setQuantity(item.getQuantity() + purchaseRequest.getQuantity());
+
+            }
+            else{
+                PurchaseItem newItem = new PurchaseItem();
+                newItem.setProduct(product);
+                newItem.setQuantity(purchaseRequest.getQuantity());
+                purchase.addPurchaseItem(newItem);
+
+            }
             shoppingHistoryRepository.save(purchase);
+
         }
     }
 

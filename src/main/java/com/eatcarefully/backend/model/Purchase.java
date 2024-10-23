@@ -56,6 +56,18 @@ public class Purchase {
                 .findFirst();
     }
 
+    public Boolean containsItemWitProduct(Product product){
+
+        if(product == null || this.purchasedItems.isEmpty())
+            return false;
+
+        return this.purchasedItems.stream()
+                .anyMatch(item -> item.getProduct().getId().equals(product.getId()));
+
+    }
+
+
+
 
     public Boolean removePurchaseItem(PurchaseItem item){
 
