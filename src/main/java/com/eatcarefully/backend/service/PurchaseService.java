@@ -2,9 +2,8 @@ package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.controller.PurchaseRequest;
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.*;
-import com.eatcarefully.backend.repository.IngredientRepository;
-import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,14 +19,12 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PurchaseService {
 
-    private static final String USERNAME_CLAIM = "preferred_username";
-    private final IngredientRepository ingredientRepository;
-    private final ProductRepository productRepository;
-    private final PurchaseRepository shoppingHistoryRepository;
+    private final PurchaseRepository purchaseRepository;
     private final ProductService productService;
+    private final JwtHelper jwtHelper;
 
     public void addPurchaseItem(Jwt jwt, PurchaseRequest purchaseRequest) {
-        String username = getUsernameFromToken(jwt);
+        String username = jwtHelper.getUsernameFromToken(jwt);
 
         // get or create purchase
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
@@ -45,28 +42,26 @@ public class PurchaseService {
                 PurchaseItem item = itemOpt.get();
                 item.setQuantity(item.getQuantity() + purchaseRequest.getQuantity());
 
-            }
-            else{
+            } else {
                 PurchaseItem newItem = new PurchaseItem();
                 newItem.setProduct(product);
                 newItem.setQuantity(purchaseRequest.getQuantity());
                 purchase.addPurchaseItem(newItem);
-
             }
-            shoppingHistoryRepository.save(purchase);
+            purchaseRepository.save(purchase);
 
         }
     }
 
     public Purchase getOrCreatePurchase(String username, LocalDate purchaseDate){
 
-        Optional<Purchase> purchase = shoppingHistoryRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
+        Optional<Purchase> purchase = purchaseRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
 
         if(purchase.isEmpty()){
             Purchase newPurchase = new Purchase();
             newPurchase.setUsername(username);
             newPurchase.setPurchaseDate(LocalDate.now());
-            shoppingHistoryRepository.save(newPurchase);
+            purchaseRepository.save(newPurchase);
             return newPurchase;
         } else {
             return purchase.get();
@@ -74,31 +69,27 @@ public class PurchaseService {
     }
 
     public List<PurchaseDTO> getWholePurchaseHistory(Jwt jwt) {
-        String username = getUsernameFromToken(jwt);
-        List<Purchase> purchases = shoppingHistoryRepository.findByUsername(username);
+        String username = jwtHelper.getUsernameFromToken(jwt);
+        List<Purchase> purchases = purchaseRepository.findByUsername(username);
         return purchases.stream()
                 .map(Purchase::toDTO)
                 .toList();
     }
 
     public Page<PurchaseDTO> getNarrowedPurchaseHistory(Jwt jwt, LocalDate start, LocalDate end, Pageable pageable) {
-        String username = getUsernameFromToken(jwt);
-        Page<Purchase> purchasesPage = shoppingHistoryRepository.findByUsernameAndPurchaseDateBetween(username, start, end, pageable);
+        String username = jwtHelper.getUsernameFromToken(jwt);
+        Page<Purchase> purchasesPage = purchaseRepository.findByUsernameAndPurchaseDateBetween(username, start, end, pageable);
         return purchasesPage.map(Purchase::toDTO);
-    }
-
-    private String getUsernameFromToken(Jwt jwt){
-        return jwt.getClaim(USERNAME_CLAIM);
     }
 
 
 
     public Boolean removePurchaseItem(Jwt jwt, String barcode, LocalDate purchaseDate, int quantity){
 
-        String username = getUsernameFromToken(jwt);
+        String username = jwtHelper.getUsernameFromToken(jwt);
 
         // check if purchase exists
-        Optional<Purchase> purchaseOpt = shoppingHistoryRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
+        Optional<Purchase> purchaseOpt = purchaseRepository.findByUsernameAndPurchaseDate(username, purchaseDate);
 
         if( purchaseOpt.isEmpty())
             // purchase not found
@@ -125,7 +116,7 @@ public class PurchaseService {
             item.setQuantity(item.getQuantity() - quantity);
         }
 
-        shoppingHistoryRepository.save(purchase);
+        purchaseRepository.save(purchase);
         return true;
 
     }

@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.service;
 
+import com.eatcarefully.backend.helper.ProductJsonHelper;
 import com.eatcarefully.backend.model.Allergen;
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
@@ -49,11 +50,8 @@ public class ProductJsonFactory {
 
         List<Allergen> allergens = getAllergens(productObject);
 
-        Product product = new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients);
 
-
-
-        return product;
+        return new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients);
 
     }
 
@@ -97,7 +95,7 @@ public class ProductJsonFactory {
 
             for(int i = 0; i < allergensHierarchy.length(); i++){
 
-                String name = ProductJSONUtils.formatApiString(allergensHierarchy.getString(i));
+                String name = ProductJsonHelper.formatApiString(allergensHierarchy.getString(i));
                 allergens.add(allergenService.findOrCreateAllergen(name));
             }
         }
@@ -128,9 +126,9 @@ public class ProductJsonFactory {
 
     private List<Tag> getTags(JSONObject productObject){
 
-        List<Tag> tags = new ArrayList<Tag>();
+        List<Tag> tags = new ArrayList<>();
 
-        JSONObject ingredientAnalysisObject = ProductJSONUtils.getNestedObject(productObject, List.of(
+        JSONObject ingredientAnalysisObject = ProductJsonHelper.getNestedObject(productObject, List.of(
                 "ingredients_analysis"
         ));
 
@@ -173,7 +171,7 @@ public class ProductJsonFactory {
 
         if(allergensHierarchy != null && !allergensHierarchy.isEmpty()){
 
-            Boolean isGlutenFree = true;
+            boolean isGlutenFree = true;
 
             for(int i = 0; i< allergensHierarchy.length(); i++){
                 String allergen = allergensHierarchy.optString(i);
@@ -191,7 +189,7 @@ public class ProductJsonFactory {
 
         //eco packaging
 
-        JSONObject packagingObject = ProductJSONUtils.getNestedObject(productObject, List.of(
+        JSONObject packagingObject = ProductJsonHelper.getNestedObject(productObject, List.of(
                 "ecoscore_data", "adjustments", "packaging"
         ));
 
@@ -222,7 +220,7 @@ public class ProductJsonFactory {
 
                     JSONObject innerIngredient = innerIngredients.getJSONObject(j);
 
-                    String name = ProductJSONUtils.formatApiString(innerIngredient.optString("id"));
+                    String name = ProductJsonHelper.formatApiString(innerIngredient.optString("id"));
                     Float content = innerIngredient.optFloat("percent_estimate");
 
                     if( ingredientsMap.containsKey(name))
@@ -234,7 +232,7 @@ public class ProductJsonFactory {
             }
             // if there is no nested ingredients add outer ingredient
             else{
-                String name = ProductJSONUtils.formatApiString(object.optString("id"));
+                String name = ProductJsonHelper.formatApiString(object.optString("id"));
                 Float content = object.optFloat("percent_estimate");
 
                 if( ingredientsMap.containsKey(name))
@@ -272,14 +270,12 @@ public class ProductJsonFactory {
 
                 //get english version if possible
                 if(display.keySet().contains("en")){
-                    String imageUrl = display.optString("en");
-                    return imageUrl;
+                    return display.optString("en");
                 }
                 //else get first
                 else{
 
-                    String imageUrl = display.optString(display.keySet().toArray()[0].toString());
-                    return imageUrl;
+                    return display.optString(display.keySet().toArray()[0].toString());
                 }
             }
         }

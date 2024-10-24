@@ -1,10 +1,10 @@
-package com.eatcarefully.backend.service;
+package com.eatcarefully.backend.helper;
 
 import org.json.JSONObject;
 
 import java.util.List;
 
-public class ProductJSONUtils {
+public class ProductJsonHelper {
 
 
 
