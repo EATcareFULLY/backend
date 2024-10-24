@@ -45,6 +45,22 @@ server:
     context-path: /api
 
 
+openfoodfacts:
+  url: test
+  requestparams: test
+
+
+
+openai:
+  model: gpt-3.5-turbo-0125
+  api:
+    url: https://api.openai.com/v1/completions
+    key: {openAIKey}
+
+
+
+
+
 
 
 

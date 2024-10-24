@@ -2,12 +2,15 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.ProductRecommendationDTO;
 import com.eatcarefully.backend.model.Product;
+import com.eatcarefully.backend.service.OpenAIService;
 import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +20,8 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+
+    private final OpenAIService openAIService;
 
     @GetMapping("/{barcode}")
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
@@ -61,16 +66,22 @@ public class ProductController {
         }
 
     @PostMapping("/scan-label")
-    public ResponseEntity<?> getLabelEvaluation(@RequestBody Map<String, String> request){
+    public ResponseEntity<?> getLabelEvaluation(@RequestBody Map<String, String> request) throws IOException, InterruptedException {
 
         String labelText = request.get("labelText");
 
         if(labelText.isEmpty() || labelText.isBlank())
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 
-        String eval = labelText + ": Mock eval response";
+        String prompt = openAIService.createPrompt(labelText);
 
-        return ResponseEntity.ok(eval);
+        String eval = openAIService.getOpenAIResponse(prompt);
+
+        if( eval.isEmpty() && eval.isBlank())
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        else
+            return ResponseEntity.ok(eval);
 
     }
 
