@@ -1,10 +1,11 @@
-package com.eatcarefully.backend.service;
+package com.eatcarefully.backend.helper;
 
-import com.eatcarefully.backend.helper.ProductJsonHelper;
 import com.eatcarefully.backend.model.Allergen;
 import com.eatcarefully.backend.model.Ingredient;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Tag;
+import com.eatcarefully.backend.service.AllergenService;
+import com.eatcarefully.backend.service.TagService;
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;

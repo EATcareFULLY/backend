@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.service;
 
+import com.eatcarefully.backend.helper.ProductJsonFactory;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.repository.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -88,8 +89,7 @@ public class ProductService {
         if(result != null){
             String resultId = result.optString("id");
 
-            if(resultId.equals("product_found"))
-                return true;
+            return resultId.equals("product_found");
         }
 
         return false;

@@ -2,7 +2,7 @@ package com.eatcarefully.backend;
 
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.repository.ProductRepository;
-import com.eatcarefully.backend.service.ProductJsonFactory;
+import com.eatcarefully.backend.helper.ProductJsonFactory;
 import com.eatcarefully.backend.service.ProductService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
