@@ -32,7 +32,7 @@ public class PurchaseController {
     @PostMapping()
     public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
         if (purchaseRequest.getQuantity() <= 0)
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
 
 
         shoppingService.addPurchaseItem(jwt, purchaseRequest);
@@ -74,17 +74,22 @@ public class PurchaseController {
                                                      @RequestBody RemovePurchaseItemDTO removeRequest) {
 
         if(removeRequest.getQuantity() <= 0){
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
         else{
 
             if(shoppingService.removePurchaseItem(jwt, removeRequest.getBarcode(),removeRequest.getPurchaseDate(), removeRequest.getQuantity()))
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             else
-                return ResponseEntity.badRequest().build();
+                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 
         }
 
     }
+
+
+
+
+
 
 }

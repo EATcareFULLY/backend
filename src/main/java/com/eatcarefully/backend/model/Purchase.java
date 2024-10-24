@@ -56,13 +56,13 @@ public class Purchase {
                 .findFirst();
     }
 
-    public Boolean containsItemWitProduct(Product product){
+    public Boolean containsItemWithBarcode(String barcode){
 
-        if(product == null || this.purchasedItems.isEmpty())
+        if(barcode == null || this.purchasedItems.isEmpty())
             return false;
 
         return this.purchasedItems.stream()
-                .anyMatch(item -> item.getProduct().getId().equals(product.getId()));
+                .anyMatch(item -> item.getProduct().getId().equals(barcode));
 
     }
 
