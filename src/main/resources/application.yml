@@ -49,7 +49,7 @@ server:
     context-path: /api
 
 tesseract:
-  path: ${TESSERACT_TESTDATA_DIR:C:\Program Files\Tesseract-OCR\tessdata} # no typo here
+  path: ${TESSERACT_DATA_PATH:classpath:tessdata}
 
 
 
