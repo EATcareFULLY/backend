@@ -31,6 +31,7 @@ spring:
         jwt:
           issuer-uri: http://localhost:8080/realms/eat-carefully
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+    enabled: ${SECURITY_ENABLED:true}
 
   servlet:
     multipart:
