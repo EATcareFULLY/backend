@@ -20,7 +20,8 @@ services:
     container_name: keycloak
     image: bitnami/keycloak:24.0.5
     volumes:
-      - ./import:/opt/bitnami/keycloak/data/import
+      - ./import/realm:/opt/bitnami/keycloak/data/import
+      - ./import/theme:/opt/bitnami/keycloak/providers
     environment:
       KEYCLOAK_DATABASE_HOST: keycloak_db
       KEYCLOAK_DATABASE_NAME: keycloakdb
