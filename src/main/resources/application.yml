@@ -51,26 +51,3 @@ server:
 
 tesseract:
   path: ${TESSERACT_DATA_PATH:classpath:tessdata}
-
-
-
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          keycloak:
-#            client-id: backend_client
-#            client-secret: HtGU6TxlSfOz2rKBnhEi9XRk2rLJtKJw
-#            authorization-grant-type: authorization_code
-#            redirect-uri: http://localhost:8081/login/oauth2/code/keycloak
-#            scope:
-#              - openid
-#              - profile
-#              - email
-#        provider:
-#          keycloak:
-#            authorization-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/auth
-#            token-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/token
-#            user-info-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/userinfo
-#            jwk-set-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/certs
-#            user-name-attribute: preferred_username
