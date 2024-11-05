@@ -1,13 +1,18 @@
 package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.ProductRecommendationDTO;
+import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +22,8 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+
+    private final ImageHelper imageHelper;
 
     @GetMapping("/{barcode}")
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
@@ -60,17 +67,37 @@ public class ProductController {
 
         }
 
-    @PostMapping("/scan-label")
-    public ResponseEntity<?> getLabelEvaluation(@RequestBody Map<String, String> request){
+    @PostMapping("/eval-label")
+    public ResponseEntity<?> getLabelEvaluation(@RequestParam("file") MultipartFile file) throws IOException {
 
-        String labelText = request.get("labelText");
+        try {
 
-        if(labelText.isEmpty() || labelText.isBlank())
-            return ResponseEntity.badRequest().build();
+            if( file == null || file.isEmpty())
+                return ResponseEntity.badRequest().build();
 
-        String eval = labelText + ": Mock eval response";
+            // check file extension
 
-        return ResponseEntity.ok(eval);
+            if (imageHelper.isFileExtensionSupported(file)) {
+
+                // load file
+                BufferedImage image = imageHelper.convertMultipartFileToBufferedImage(file);
+
+                int width = image.getWidth();
+                int height = image.getHeight();
+
+                String eval = String.format("File size: %d x %d px", width, height);
+
+                return ResponseEntity.ok(eval);
+            }
+            else
+                return ResponseEntity.badRequest().build();
+
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
+        }
+
+
 
     }
 
