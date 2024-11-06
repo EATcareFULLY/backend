@@ -5,6 +5,7 @@ import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
+import com.eatcarefully.backend.service.GeminiChatService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,8 @@ public class TestController {
     private TagRepository tagRepository;
 
     private AllergenRepository allergenRepository;
+
+    private GeminiChatService geminiChatService;
 
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
@@ -220,6 +223,15 @@ public class TestController {
                 new Product("19L", "Salsa", "C", "Brand",null,List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
                 new Product("20L", "Guacamole", "A", "Brand",null,List.of(tags.get(4), tags.get(1)), allergens,List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
         );
+    }
+
+
+    @GetMapping(path = "/label-prompt")
+    public ResponseEntity<String> testChatPrompting(){
+
+        String test = "testing possum";
+        String response = geminiChatService.createPrompt(test);
+        return ResponseEntity.ok(response);
     }
 
 

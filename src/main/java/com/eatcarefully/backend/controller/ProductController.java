@@ -2,7 +2,6 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.ProductRecommendationDTO;
 import com.eatcarefully.backend.model.Product;
-import com.eatcarefully.backend.service.OpenAIService;
 import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    private final OpenAIService openAIService;
 
     @GetMapping("/{barcode}")
     @Cacheable( cacheNames = "products_resp", key = "#barcode")
@@ -73,9 +71,8 @@ public class ProductController {
         if(labelText.isEmpty() || labelText.isBlank())
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
 
-        String prompt = openAIService.createPrompt(labelText);
 
-        String eval = openAIService.getOpenAIResponse(prompt);
+        String eval = "eval";
 
         if( eval.isEmpty() && eval.isBlank())
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);

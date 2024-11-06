@@ -23,7 +23,7 @@ public class ProductJsonFactory {
 
     public Product parseJSONToProduct(JSONObject json) throws NoSuchFieldException {
 
-        if(json.isEmpty() || json == null){
+        if(json.isEmpty()){
             return null;
         }
 
