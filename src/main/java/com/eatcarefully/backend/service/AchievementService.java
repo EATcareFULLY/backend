@@ -20,22 +20,22 @@ import java.util.Optional;
 public class AchievementService {
 
     private final JwtHelper jwtHelper;
-    private final AchievementRepository achievementRepository;
+    private final AchievementRepository progressRepository;
     private final AchievementDefinitionRepository definitionRepository;
 
-    private final List<AchievementDefinition> achievementDefinitions = definitionRepository.findAll();
+    private final List<AchievementDefinition> achievementDefinitions;
 
     public List<AchievementDTO> getUserAchievements(Jwt jwt){
         String username = jwtHelper.getUsernameFromToken(jwt);
 
-        List<AchievementProgress> userAchievements = achievementRepository.findAllByUsername(username);
+        List<AchievementProgress> userAchievements = progressRepository.findAllByUsername(username);
 
         return userAchievements.stream().map(AchievementProgress::toDTO).toList();
     }
 
 
     public Optional<AchievementDTO> incrementAchievementProgress(String username, Long achievementId, int increment){
-        Optional<AchievementProgress> progressOptional = achievementRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
+        Optional<AchievementProgress> progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
         if(progressOptional.isEmpty()){
             initializeAchievementProgresses(username);
             return Optional.empty();
@@ -43,7 +43,9 @@ public class AchievementService {
             AchievementProgress progress = progressOptional.get();
             progress.setCurrentCount(progress.getCurrentCount() + increment);
 
-            AchievementDefinition definition = achievementDefinitions.stream().filter(def -> Objects.equals(def.getId(), achievementId)).findFirst().get();
+            AchievementDefinition definition = achievementDefinitions.stream().filter(
+                    def -> Objects.equals(def.getId(), achievementId)
+            ).findFirst().get();
 
             AchievementLevel levelAfterIncrement;
             if (progress.getCurrentCount() >= definition.getThresholdGold()) {
@@ -59,6 +61,7 @@ public class AchievementService {
             // only update if the level has changed
             if (levelAfterIncrement != progress.getCurrentLevel()) {
                 progress.setCurrentLevel(levelAfterIncrement);
+                progressRepository.save(progress);
                 return Optional.of(new AchievementDTO(definition.getName(), levelAfterIncrement));
             } else {
                 return Optional.empty();
@@ -66,11 +69,13 @@ public class AchievementService {
         }
     }
 
-    // TODO: check increment method (also if the returned DTO makes sense)
-    // TODO: implement initializeAchievementProgresses method
-    // TODO: use it in the purchase and analyze methods
+    // TODO: use it in the purchase methods
 
     private void initializeAchievementProgresses(String username) {
-
+        for (AchievementDefinition definition : achievementDefinitions) {
+            progressRepository.save(
+                    new AchievementProgress(null, username, definition, 0, AchievementLevel.NONE)
+            );
+        }
     }
 }

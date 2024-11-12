@@ -2,10 +2,15 @@ package com.eatcarefully.backend.model.achievement;
 
 import com.eatcarefully.backend.dto.AchievementDTO;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AchievementProgress {
 
     @Id
