@@ -5,6 +5,7 @@ import com.eatcarefully.backend.model.achievement.AchievementLevel;
 
 public record AchievementDTO(
         String achievementName,
+        String achievementDescription,
         AchievementLevel level
 ) {
 }

@@ -7,6 +7,7 @@ import com.eatcarefully.backend.model.achievement.AchievementLevel;
 import com.eatcarefully.backend.model.achievement.AchievementProgress;
 import com.eatcarefully.backend.repository.AchievementDefinitionRepository;
 import com.eatcarefully.backend.repository.AchievementRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,23 @@ public class AchievementService {
     private final AchievementRepository progressRepository;
     private final AchievementDefinitionRepository definitionRepository;
 
-    private final List<AchievementDefinition> achievementDefinitions;
+    private List<AchievementDefinition> achievementDefinitions;
+
+    @PostConstruct
+    private void initializeAchievementDefinitions() {
+        achievementDefinitions = definitionRepository.findAll();
+    }
 
     public List<AchievementDTO> getUserAchievements(Jwt jwt){
         String username = jwtHelper.getUsernameFromToken(jwt);
 
         List<AchievementProgress> userAchievements = progressRepository.findAllByUsername(username);
+
+        if (userAchievements.isEmpty()) {
+            initializeAchievementProgresses(username);
+            // retry getting the progress after initialization
+            userAchievements = progressRepository.findAllByUsername(username);
+        }
 
         return userAchievements.stream().map(AchievementProgress::toDTO).toList();
     }
@@ -36,6 +48,13 @@ public class AchievementService {
 
     public Optional<AchievementDTO> incrementAchievementProgress(String username, Long achievementId, int increment){
         Optional<AchievementProgress> progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
+
+        if (progressOptional.isEmpty()) {
+            initializeAchievementProgresses(username);
+            // retry getting the progress after initialization
+            progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
+        }
+
         if(progressOptional.isEmpty()){
             initializeAchievementProgresses(username);
             return Optional.empty();
@@ -55,6 +74,7 @@ public class AchievementService {
             } else if (progress.getCurrentCount() >= definition.getThresholdBronze()) {
                 levelAfterIncrement = AchievementLevel.BRONZE;
             } else {
+                progressRepository.save(progress);
                 return Optional.empty(); // no level achieved yet
             }
 
@@ -62,8 +82,9 @@ public class AchievementService {
             if (levelAfterIncrement != progress.getCurrentLevel()) {
                 progress.setCurrentLevel(levelAfterIncrement);
                 progressRepository.save(progress);
-                return Optional.of(new AchievementDTO(definition.getName(), levelAfterIncrement));
+                return Optional.of(new AchievementDTO(definition.getName(), "Achievement Description Placeholder", levelAfterIncrement));
             } else {
+                progressRepository.save(progress);
                 return Optional.empty();
             }
         }

@@ -29,10 +29,9 @@ public class ProductController {
     private final ImageHelper imageHelper;
 
     @GetMapping("/{barcode}")
-    @Cacheable(cacheNames = "products_resp", key = "#barcode")
     public ResponseEntity<ScanResponseDTO> getProductDetailsByBarcode(@AuthenticationPrincipal Jwt jwt, @PathVariable String barcode) {
 
-        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(jwt, barcode);
+        ScanResponseDTO scanResponse = productService.getProductDetails(jwt, barcode);
 
         return ResponseEntity.ok(
                 Objects.requireNonNullElseGet(scanResponse, this::dummyReturnProduct)

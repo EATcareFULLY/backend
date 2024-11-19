@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.controller.PurchaseRequest;
+import com.eatcarefully.backend.dto.AchievementDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.*;
@@ -22,6 +23,7 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final ProductService productService;
     private final JwtHelper jwtHelper;
+    private final AchievementService achievementService;
 
     public void addPurchaseItem(Jwt jwt, PurchaseRequest purchaseRequest) {
         String username = jwtHelper.getUsernameFromToken(jwt);
@@ -35,11 +37,11 @@ public class PurchaseService {
         // alter and add purchase item
         if( product != null){
 
-            Optional<PurchaseItem> itemOpt = purchase.getPurchaseItemByBarcode(purchaseRequest.getBarcode());
+            Optional<PurchaseItem> purchaseItemOptional = purchase.getPurchaseItemByBarcode(purchaseRequest.getBarcode());
 
-            if(itemOpt.isPresent()){
+            if(purchaseItemOptional.isPresent()){
 
-                PurchaseItem item = itemOpt.get();
+                PurchaseItem item = purchaseItemOptional.get();
                 item.setQuantity(item.getQuantity() + purchaseRequest.getQuantity());
 
             } else {
@@ -50,8 +52,14 @@ public class PurchaseService {
             }
             purchaseRepository.save(purchase);
 
+//            List<AchievementDTO> newAchievements = achievementService.verifyPurchaseAchievements(username, product, purchaseRequest.getQuantity());
+//            return newAchievements;
         }
-    }
+    }       //TODO: implement verifyPurchaseAchievements method,
+            // add verifyScanAchievements method
+            // test verifyPurchaseAchievements method
+            // fix tests
+            // go to leaderboard feature
 
     public Purchase getOrCreatePurchase(String username, LocalDate purchaseDate){
 

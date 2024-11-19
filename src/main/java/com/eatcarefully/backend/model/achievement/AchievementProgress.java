@@ -30,6 +30,7 @@ public class AchievementProgress {
     public AchievementDTO toDTO() {
         return new AchievementDTO(
                 achievementDefinition.getName(),
+                achievementDefinition.getDescription(),
                 currentLevel
                 );
     }

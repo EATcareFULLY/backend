@@ -12,6 +12,6 @@ public record ScanResponseDTO(
         List<AllergenDTO> allergens,
         List<IngredientDTO> ingredients,
 
-        AchievementDTO newAchievement
+        List<AchievementDTO> newAchievements
 ) {
 }

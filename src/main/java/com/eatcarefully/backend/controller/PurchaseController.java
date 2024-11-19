@@ -31,10 +31,9 @@ public class PurchaseController {
 
     @PostMapping()
     public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
-        if (purchaseRequest.getQuantity() <= 0)
-            return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
-
-
+        if (purchaseRequest.getQuantity() <= 0) {
+            return ResponseEntity.badRequest().body("Quantity must be greater than 0");
+        }
         shoppingService.addPurchaseItem(jwt, purchaseRequest);
         return ResponseEntity.ok("Purchase added successfully");
     }
