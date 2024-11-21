@@ -2,6 +2,8 @@ package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.dto.AchievementDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
+import com.eatcarefully.backend.model.Category;
+import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.achievement.AchievementDefinition;
 import com.eatcarefully.backend.model.achievement.AchievementLevel;
 import com.eatcarefully.backend.model.achievement.AchievementProgress;
@@ -99,4 +101,10 @@ public class AchievementService {
             );
         }
     }
+
+//    public List<AchievementDTO> verifyPurchaseAchievements(String username, Product purchasedProduct) {
+//        List<String> categories = purchasedProduct.getCategories().stream().map(Category::getName).toList();
+//
+//        // ify z każdą kategorią
+//    }
 }

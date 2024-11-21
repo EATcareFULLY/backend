@@ -1,10 +1,8 @@
 package com.eatcarefully.backend.helper;
 
-import com.eatcarefully.backend.model.Allergen;
-import com.eatcarefully.backend.model.Ingredient;
-import com.eatcarefully.backend.model.Product;
-import com.eatcarefully.backend.model.Tag;
+import com.eatcarefully.backend.model.*;
 import com.eatcarefully.backend.service.AllergenService;
+import com.eatcarefully.backend.service.CategoryService;
 import com.eatcarefully.backend.service.TagService;
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
@@ -21,6 +19,7 @@ public class ProductJsonFactory {
 
     private TagService tagService;
     private AllergenService allergenService;
+    private CategoryService categoryService;
 
 
     public Product parseJSONToProduct(JSONObject json) throws NoSuchFieldException {
@@ -47,12 +46,16 @@ public class ProductJsonFactory {
         JSONArray ingredientsArray = productObject.optJSONArray("ingredients");
         List<Ingredient> ingredients = ingredientsArray != null ? getIngredientsList(ingredientsArray) : List.of();
 
+        String categoriesSingleString = productObject.optString("categories");
+        List<String> categoriesList = getCategoriesList(categoriesSingleString);
+        List<Category> categories = categoriesList != null ? saveCategories(categoriesList) : List.of();
+
         List<Tag> tags = getTags(productObject);
 
         List<Allergen> allergens = getAllergens(productObject);
 
 
-        return new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients);
+        return new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients, categories);
 
     }
 
@@ -283,7 +286,27 @@ public class ProductJsonFactory {
         return null;
     }
 
+    private List<String> getCategoriesList(String categoriesString) {
+        List<Category> categories = new ArrayList<>();
 
+        List<String> categoriesStringList = Arrays.stream(
+                categoriesString.split(","))
+                .map(String::trim)
+                .map(s -> s.startsWith("en:") ? s.substring(3) : s)
+                .toList();
+
+        return categoriesStringList;
+    }
+
+    private List<Category> saveCategories(List<String> categoriesStringList) {
+        List<Category> categories = new ArrayList<>();
+
+        for (String categoryName : categoriesStringList) {
+            categories.add(categoryService.findOrCreateCategory(categoryName));
+        }
+
+        return categories;
+    }
 
 
 }

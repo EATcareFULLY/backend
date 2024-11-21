@@ -39,4 +39,7 @@ public class Product {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Ingredient> ingredients;
+
+    @ManyToMany
+    private List<Category> categories;
 }

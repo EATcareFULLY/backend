@@ -52,14 +52,10 @@ public class PurchaseService {
             }
             purchaseRepository.save(purchase);
 
-//            List<AchievementDTO> newAchievements = achievementService.verifyPurchaseAchievements(username, product, purchaseRequest.getQuantity());
+//            List<AchievementDTO> newAchievements = achievementService.verifyPurchaseAchievements(username, product);
 //            return newAchievements;
         }
-    }       //TODO: implement verifyPurchaseAchievements method,
-            // add verifyScanAchievements method
-            // test verifyPurchaseAchievements method
-            // fix tests
-            // go to leaderboard feature
+    }
 
     public Purchase getOrCreatePurchase(String username, LocalDate purchaseDate){
 
