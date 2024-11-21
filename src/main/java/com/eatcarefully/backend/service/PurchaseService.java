@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.controller.PurchaseRequest;
+import com.eatcarefully.backend.dto.HistoryAnalysisProductDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.*;
@@ -118,6 +119,21 @@ public class PurchaseService {
 
         purchaseRepository.save(purchase);
         return true;
+
+    }
+
+
+    public List<HistoryAnalysisProductDTO> getDataForHistoryAnalysis(Jwt jwt){
+
+        String username = jwtHelper.getUsernameFromToken(jwt);
+        List<Purchase> purchases = purchaseRepository.findByUsername(username);
+
+        List<HistoryAnalysisProductDTO> mappedList = purchases.stream()
+                .map(Purchase::toListOfHistoryAnalysisProductDTO)
+                .flatMap(List::stream)
+                .toList();
+
+        return mappedList;
 
     }
 

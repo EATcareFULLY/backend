@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.HistoryAnalysisProductDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -67,13 +68,19 @@ public class Purchase {
     }
 
 
-
-
     public Boolean removePurchaseItem(PurchaseItem item){
 
         if(item == null)
             return false;
         return this.purchasedItems.remove(item);
+
+    }
+
+    public List<HistoryAnalysisProductDTO> toListOfHistoryAnalysisProductDTO(){
+
+        return this.purchasedItems.stream()
+                .map(PurchaseItem::historyAnalysisProductDTO)
+                .toList();
 
     }
 
