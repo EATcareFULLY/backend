@@ -5,12 +5,15 @@ import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
+import com.eatcarefully.backend.service.PreferenceNamesService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +32,8 @@ public class TestController {
     private TagRepository tagRepository;
 
     private AllergenRepository allergenRepository;
+
+    private PreferenceNamesService preferenceNamesService;
 
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
@@ -220,6 +225,26 @@ public class TestController {
                 new Product("19L", "Salsa", "C", "Brand",null,List.of(tags.get(2), tags.get(3)),allergens, List.of(ingredients.get(6), ingredients.get(9), ingredients.get(0))),
                 new Product("20L", "Guacamole", "A", "Brand",null,List.of(tags.get(4), tags.get(1)), allergens,List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)))
         );
+    }
+
+
+
+    @PostMapping("create-preference-name")
+    public ResponseEntity<PreferenceName> createPreferenceName(@RequestParam String name){
+
+        try {
+            return ResponseEntity.ok(preferenceNamesService.createPreferenceName(name));
+
+        }
+        catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    @GetMapping("preference-name/all")
+    public ResponseEntity<List<PreferenceName>> getAllPreferenceNames(){
+        return ResponseEntity.ok(preferenceNamesService.getAllPreferenceNames());
     }
 
 
