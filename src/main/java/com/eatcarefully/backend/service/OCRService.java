@@ -22,7 +22,7 @@ public class OCRService {
     private final ImagePreprocessingService imagePreprocessingService;
 
 
-    public ResponseEntity<String> extractTextFromFile(MultipartFile imageFile) {
+    public String extractTextFromFile(MultipartFile imageFile) {
         try {
 
             // convert to temporary file for OpenCV processing
@@ -43,11 +43,10 @@ public class OCRService {
             Files.deleteIfExists(tempFile);
             Files.deleteIfExists(processedTempFile);
 
-            return ResponseEntity.ok(result);
+            return result;
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error extracting text from image: " + e.getMessage());
+            return null;
         }
     }
 }

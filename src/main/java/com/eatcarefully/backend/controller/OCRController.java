@@ -21,6 +21,6 @@ public class OCRController {
     public ResponseEntity<String> extractText(
             @RequestParam("file") MultipartFile file) {
 
-        return ocrService.extractTextFromFile(file);
+        return ResponseEntity.ok(ocrService.extractTextFromFile(file));
     }
 }

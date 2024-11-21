@@ -2,6 +2,7 @@ package com.eatcarefully.backend;
 
 
 import com.eatcarefully.backend.controller.ProductController;
+import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ public class ProductControllerTest {
 
     @MockBean
     private ProductService productService;
+
+    @MockBean
+    private ImageHelper imageHelper;
 
 
 
