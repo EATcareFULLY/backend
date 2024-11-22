@@ -10,10 +10,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user-profile")
@@ -25,23 +22,40 @@ public class UserProfileAndPreferencesController {
     private JwtHelper jwtHelper;
 
 
-    @PostMapping("/update")
-    public ResponseEntity<UserThresholdAndPreferencesDTO> updateThresholdsAndPreferences(@AuthenticationPrincipal Jwt jwt ,
-                                                                                          @RequestBody UserThresholdAndPreferencesDTO dto){
 
-        // check if profile exist
+    @GetMapping()
+    public ResponseEntity<UserThresholdAndPreferencesDTO> getUserThresholdsAndPreferences(@AuthenticationPrincipal Jwt jwt){
+
         String username = jwtHelper.getUsernameFromToken(jwt);
-
         try{
-            return ResponseEntity.ok(userService.updateUserPreferencesAndThresholds(username, dto));
-
+            return ResponseEntity.ok(new UserThresholdAndPreferencesDTO(
+                    userService.getUserThresholds(username),
+                    userService.getUserPreferencesList(username)
+            ));
 
         }
         catch (IllegalArgumentException e){
             return ResponseEntity.notFound().build();
         }
+
     }
 
+
+
+    @PostMapping("/update")
+    public ResponseEntity<UserThresholdAndPreferencesDTO> updateThresholdsAndPreferences(@AuthenticationPrincipal Jwt jwt ,
+                                                                                          @RequestBody UserThresholdAndPreferencesDTO dto) {
+
+        try {
+
+            // check if profile exist
+            String username = jwtHelper.getUsernameFromToken(jwt);
+            return ResponseEntity.ok(userService.updateUserPreferencesAndThresholds(username, dto));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+
+        }
+    }
 
 
 }
