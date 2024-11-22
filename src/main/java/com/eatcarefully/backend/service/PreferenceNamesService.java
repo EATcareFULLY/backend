@@ -25,17 +25,22 @@ public class PreferenceNamesService {
         return preferenceNameRepository.save(preferenceName);
 
     }
-
     public PreferenceName getPreferenceName(String name){
 
         return preferenceNameRepository.findByName(name).orElse(null);
 
     }
 
-    public List<PreferenceName> getAllPreferenceNames(){
+    public List<String> getAllPreferenceNames(){
 
-        return preferenceNameRepository.findAll();
+        return preferenceNameRepository.findAll().stream().map(PreferenceName::getName).toList();
     }
+
+    public void removePreferenceName(String name){
+        preferenceNameRepository.findByName(name).ifPresent(prefName -> preferenceNameRepository.delete(prefName));
+
+    }
+
 
 
 

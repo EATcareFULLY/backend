@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.model;
 
 
+import com.eatcarefully.backend.dto.UserPreferenceDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +30,11 @@ public class UserPreference {
     private PreferenceName preferenceName;
 
     private int wanted;
+
+
+    public UserPreferenceDTO toDTO(){
+        return new UserPreferenceDTO(this.preferenceName.getName(), this.wanted);
+    }
 
 
 

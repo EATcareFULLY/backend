@@ -26,21 +26,21 @@ public class UserProfileAndPreferencesController {
 
 
     @PostMapping("/update")
-    public ResponseEntity<UserNutritionalProfile> updateThresholdsAndPreferences(@AuthenticationPrincipal Jwt jwt ,
+    public ResponseEntity<UserThresholdAndPreferencesDTO> updateThresholdsAndPreferences(@AuthenticationPrincipal Jwt jwt ,
                                                                                           @RequestBody UserThresholdAndPreferencesDTO dto){
 
         // check if profile exist
         String username = jwtHelper.getUsernameFromToken(jwt);
 
-        UserNutritionalProfile profile = userService.userProfileExists(username) ?
-                userService.updateNutritionalProfileThresholds(username, dto.getThresholds()) :
-                userService.createNutritionalProfile(username, dto.getThresholds());
+        try{
+            return ResponseEntity.ok(userService.updateUserPreferencesAndThresholds(username, dto));
 
 
-        return ResponseEntity.ok(profile);
-
+        }
+        catch (IllegalArgumentException e){
+            return ResponseEntity.notFound().build();
+        }
     }
-
 
 
 

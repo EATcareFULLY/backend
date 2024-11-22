@@ -10,10 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -243,8 +240,15 @@ public class TestController {
     }
 
     @GetMapping("preference-name/all")
-    public ResponseEntity<List<PreferenceName>> getAllPreferenceNames(){
+    public ResponseEntity<List<String>> getAllPreferenceNames(){
         return ResponseEntity.ok(preferenceNamesService.getAllPreferenceNames());
+    }
+
+
+    @DeleteMapping("preference-name")
+    public ResponseEntity<String> removePreferenceName(@RequestParam String name){
+        preferenceNamesService.removePreferenceName(name);
+        return ResponseEntity.ok("PreferenceName removed successfully");
     }
 
 
