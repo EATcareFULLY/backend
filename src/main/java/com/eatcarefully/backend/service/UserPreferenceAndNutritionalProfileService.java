@@ -148,6 +148,16 @@ public class UserPreferenceAndNutritionalProfileService {
     }
 
 
+    public UserThresholdAndPreferencesDTO getOrCreateThresholdsAndPreferences(String username){
+
+        if( ! userProfileExists(username))
+            createNutritionalProfile(username, new NutritionalThresholdsDTO());
+
+        return new UserThresholdAndPreferencesDTO(getUserThresholds(username), getUserPreferencesList(username));
+
+    }
+
+
 
 
 

@@ -28,10 +28,7 @@ public class UserProfileAndPreferencesController {
 
         String username = jwtHelper.getUsernameFromToken(jwt);
         try{
-            return ResponseEntity.ok(new UserThresholdAndPreferencesDTO(
-                    userService.getUserThresholds(username),
-                    userService.getUserPreferencesList(username)
-            ));
+            return ResponseEntity.ok(userService.getOrCreateThresholdsAndPreferences(username));
 
         }
         catch (IllegalArgumentException e){
