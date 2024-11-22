@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.service.external;
 
 import com.eatcarefully.backend.dto.HistoryAnalysisProductDTO;
+import com.eatcarefully.backend.dto.HistoryAnalysisRequestDTO;
 import com.eatcarefully.backend.exceptions.ModelValidationException;
 import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,14 +31,14 @@ public class HistoryAnalysisClient implements IHistoryAnalysisClient{
 
 
     @Override
-    public Mono<JsonNode> submitProductsForHistoryAnalysis(List<HistoryAnalysisProductDTO> products) {
+    public Mono<JsonNode> submitProductsForHistoryAnalysis(HistoryAnalysisRequestDTO dto) {
 
 
 
             return webClient.post()
                     .uri(url)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(products.toArray())
+                    .bodyValue(dto)
                     .retrieve()
 
                     .onStatus(HttpStatus.INTERNAL_SERVER_ERROR::equals, response ->

@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,7 +123,6 @@ public class PurchaseService {
 
     }
 
-
     public List<HistoryAnalysisProductDTO> getDataForHistoryAnalysis(Jwt jwt){
 
         String username = jwtHelper.getUsernameFromToken(jwt);
@@ -136,6 +136,26 @@ public class PurchaseService {
         return mappedList;
 
     }
+
+
+    public List<String> getBarcodesFromLeastHealthyProductsPurchasedOn(String username, LocalDate date, int barcodesNum){
+
+        Purchase purchase = purchaseRepository.findByUsernameAndPurchaseDate(username, date).orElse(null);
+
+        if(purchase == null)
+            return null;
+
+        ArrayList<Product> purchasesProducts = new ArrayList<>(purchase.getPurchasedItems().stream().map(PurchaseItem::getProduct).toList());
+
+        purchasesProducts.sort( (p1,p2) -> p2.getScore().compareTo(p1.getScore()));
+
+        return purchasesProducts.stream().limit(barcodesNum).map(Product::getId).toList();
+
+
+    }
+
+
+
 
 
 }
