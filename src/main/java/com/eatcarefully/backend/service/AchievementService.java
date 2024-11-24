@@ -2,7 +2,6 @@ package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.dto.AchievementDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
-import com.eatcarefully.backend.model.Category;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.achievement.AchievementDefinition;
 import com.eatcarefully.backend.model.achievement.AchievementLevel;
@@ -14,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,26 +36,44 @@ public class AchievementService {
     public List<AchievementDTO> getUserAchievements(Jwt jwt){
         String username = jwtHelper.getUsernameFromToken(jwt);
 
+        createProgressesIfNotExists(username);
         List<AchievementProgress> userAchievements = progressRepository.findAllByUsername(username);
-
-        if (userAchievements.isEmpty()) {
-            initializeAchievementProgresses(username);
-            // retry getting the progress after initialization
-            userAchievements = progressRepository.findAllByUsername(username);
-        }
 
         return userAchievements.stream().map(AchievementProgress::toDTO).toList();
     }
 
+    public List<AchievementDTO> verifyPurchaseAchievements(String username, Product product) {
+        List<AchievementDTO> newAchievements = new ArrayList<>();
+
+        Optional<AchievementDTO> newAchievementOptional = incrementAchievementProgress(username, 1L, 1);
+        newAchievementOptional.ifPresent(newAchievements::add);
+
+        return newAchievements; //TODO: add handling for different achievements
+
+
+        //        List<String> categories = product.getCategories().stream().map(Category::getName).toList();
+//
+//        List<AchievementDTO> unlockedAchievements = List.of();
+//
+//        for (String category : categories) {
+//            Optional<AchievementDefinition> definitionOptional = definitionRepository.findByName(category);
+//
+//            if (definitionOptional.isPresent()) {
+//                AchievementDefinition definition = definitionOptional.get();
+//                Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, definition.getId(), 1);
+//
+//                if (unlockedAchievement.isPresent()) {
+//                    unlockedAchievements.add(unlockedAchievement.get());
+//                }
+//            }
+//        }
+//
+//        return unlockedAchievements;
+    }
 
     public Optional<AchievementDTO> incrementAchievementProgress(String username, Long achievementId, int increment){
+        createProgressesIfNotExists(username);
         Optional<AchievementProgress> progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
-
-        if (progressOptional.isEmpty()) {
-            initializeAchievementProgresses(username);
-            // retry getting the progress after initialization
-            progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
-        }
 
         if(progressOptional.isEmpty()){
             initializeAchievementProgresses(username);
@@ -66,7 +84,7 @@ public class AchievementService {
 
             AchievementDefinition definition = achievementDefinitions.stream().filter(
                     def -> Objects.equals(def.getId(), achievementId)
-            ).findFirst().get();
+            ).findFirst().orElseThrow();
 
             AchievementLevel levelAfterIncrement;
             if (progress.getCurrentCount() >= definition.getThresholdGold()) {
@@ -92,7 +110,11 @@ public class AchievementService {
         }
     }
 
-    // TODO: use it in the purchase methods
+    private void createProgressesIfNotExists(String username) {
+        if (progressRepository.findAllByUsername(username).isEmpty()) {
+            initializeAchievementProgresses(username);
+        }
+    }
 
     private void initializeAchievementProgresses(String username) {
         for (AchievementDefinition definition : achievementDefinitions) {
@@ -101,6 +123,8 @@ public class AchievementService {
             );
         }
     }
+
+
 
 //    public List<AchievementDTO> verifyPurchaseAchievements(String username, Product purchasedProduct) {
 //        List<String> categories = purchasedProduct.getCategories().stream().map(Category::getName).toList();
