@@ -33,7 +33,7 @@ public class AchievementService {
         achievementDefinitions = definitionRepository.findAll();
     }
 
-    public List<AchievementDTO> getUserAchievements(Jwt jwt){
+    public List<AchievementDTO> getUserAchievements(Jwt jwt) {
         String username = jwtHelper.getUsernameFromToken(jwt);
 
         createProgressesIfNotExists(username);
@@ -43,39 +43,56 @@ public class AchievementService {
     }
 
     public List<AchievementDTO> verifyPurchaseAchievements(String username, Product product) {
-        List<AchievementDTO> newAchievements = new ArrayList<>();
+        List<AchievementDTO> unlockedAchievements = new ArrayList<>();
 
-        Optional<AchievementDTO> newAchievementOptional = incrementAchievementProgress(username, 1L, 1);
-        newAchievementOptional.ifPresent(newAchievements::add);
+        Optional<AchievementDTO> unlockedAchievementOptional = incrementAchievementProgress(username, 1L, 1);
+        unlockedAchievementOptional.ifPresent(unlockedAchievements::add);
 
-        return newAchievements; //TODO: add handling for different achievements
+        for (AchievementDefinition achievementDefinition : achievementDefinitions) {
+            switch (achievementDefinition.getAchievementType()) {
+                case PRODUCT_CATEGORY:  //TODO: handle categories in different languages
+                    if (product.getCategories().stream().anyMatch(category -> category.getName().equals(achievementDefinition.getAchievementParameter()))) {
+                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
+                        unlockedAchievement.ifPresent(unlockedAchievements::add);
+                    }
+                    break;
+                case PRODUCT_NAME:
+                    // case insensitive search
+                    String productName = product.getName().toLowerCase();
+                    String searchedPhrase = achievementDefinition.getAchievementParameter().toLowerCase();
+                    if (productName.contains(searchedPhrase)) {
+                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
+                        unlockedAchievement.ifPresent(unlockedAchievements::add);
+                    }
+                    break;
+                case NUTRI_SCORE:
+                    // case insensitive search
+                    String productNutriScore = product.getScore().toLowerCase();
+                    String achievementNutriScore = achievementDefinition.getAchievementParameter().toLowerCase();
+                    if (productNutriScore.equals(achievementNutriScore)) {
+                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
+                        unlockedAchievement.ifPresent(unlockedAchievements::add);
+                    }
+                    break;
+//                case NOVA_SCORE:
+//                    if (product.getNovaGroup().equals(achievementDefinition.getAchievementParameter())) {
+//                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
+//                        unlockedAchievement.ifPresent(unlockedAchievements::add);
+//                    }
+//                    break;
+                default:
+                    break;
+            }
+        }
 
-
-        //        List<String> categories = product.getCategories().stream().map(Category::getName).toList();
-//
-//        List<AchievementDTO> unlockedAchievements = List.of();
-//
-//        for (String category : categories) {
-//            Optional<AchievementDefinition> definitionOptional = definitionRepository.findByName(category);
-//
-//            if (definitionOptional.isPresent()) {
-//                AchievementDefinition definition = definitionOptional.get();
-//                Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, definition.getId(), 1);
-//
-//                if (unlockedAchievement.isPresent()) {
-//                    unlockedAchievements.add(unlockedAchievement.get());
-//                }
-//            }
-//        }
-//
-//        return unlockedAchievements;
+        return unlockedAchievements;
     }
 
-    public Optional<AchievementDTO> incrementAchievementProgress(String username, Long achievementId, int increment){
+    public Optional<AchievementDTO> incrementAchievementProgress(String username, Long achievementId, int increment) {
         createProgressesIfNotExists(username);
         Optional<AchievementProgress> progressOptional = progressRepository.findByUsernameAndAchievementDefinition_Id(username, achievementId);
 
-        if(progressOptional.isEmpty()){
+        if (progressOptional.isEmpty()) {
             initializeAchievementProgresses(username);
             return Optional.empty();
         } else {
@@ -116,14 +133,13 @@ public class AchievementService {
         }
     }
 
-    private void initializeAchievementProgresses(String username) {
+    private void initializeAchievementProgresses(String username) { // TODO: check whether every achievement is added
         for (AchievementDefinition definition : achievementDefinitions) {
             progressRepository.save(
                     new AchievementProgress(null, username, definition, 0, AchievementLevel.NONE)
             );
         }
     }
-
 
 
 //    public List<AchievementDTO> verifyPurchaseAchievements(String username, Product purchasedProduct) {

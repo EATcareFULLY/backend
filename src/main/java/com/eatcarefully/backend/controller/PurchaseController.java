@@ -2,8 +2,8 @@ package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.dto.PurchaseRequestDTO;
-import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.dto.PurchaseResponseDTO;
+import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +42,7 @@ public class PurchaseController {
         PurchaseResponseDTO result = shoppingService.addPurchaseItem(jwt, purchaseRequest);
 
         if(Objects.isNull(result)){
-            PurchaseResponseDTO internalErrorObject = new PurchaseResponseDTO(null, "Error while fetching product");
+            PurchaseResponseDTO internalErrorObject = new PurchaseResponseDTO(null, "Error while fetching product: product not present in the database.");
             return ResponseEntity.internalServerError().body(internalErrorObject);
         } else {
             return ResponseEntity.ok(result);

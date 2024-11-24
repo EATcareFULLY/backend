@@ -1,8 +1,6 @@
 package com.eatcarefully.backend.model.achievement;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -17,4 +15,8 @@ public class AchievementDefinition {
     private int thresholdBronze;
     private int thresholdSilver;
     private int thresholdGold;
+
+    @Enumerated(EnumType.STRING)
+    private AchievementType achievementType;
+    private String achievementParameter;
 }

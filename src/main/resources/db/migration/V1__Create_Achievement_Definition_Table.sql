@@ -5,5 +5,7 @@ CREATE TABLE achievement_definition
     description      TEXT,
     threshold_bronze INTEGER      NOT NULL,
     threshold_silver INTEGER      NOT NULL,
-    threshold_gold   INTEGER      NOT NULL
+    threshold_gold        INTEGER      NOT NULL,
+    achievement_type      VARCHAR(255) NOT NULL,
+    achievement_parameter VARCHAR(255) NOT NULL
 );
