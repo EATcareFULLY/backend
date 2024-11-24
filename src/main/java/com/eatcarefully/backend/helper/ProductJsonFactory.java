@@ -43,6 +43,9 @@ public class ProductJsonFactory {
         JSONObject nutriscoreObject = productObject.optJSONObject("nutriscore");
         String nutriscore = nutriscoreObject != null ? getNutriscore(nutriscoreObject) : null;
 
+        int novaGroup = productObject.optInt("nova_group");
+        String novaGroupString = novaGroup != 0 ? String.valueOf(novaGroup) : null;
+
         JSONArray ingredientsArray = productObject.optJSONArray("ingredients");
         List<Ingredient> ingredients = ingredientsArray != null ? getIngredientsList(ingredientsArray) : List.of();
 
@@ -55,7 +58,7 @@ public class ProductJsonFactory {
         List<Allergen> allergens = getAllergens(productObject);
 
 
-        return new Product(id, name,nutriscore, brand, frontImageUrl, tags,allergens, ingredients, categories);
+        return new Product(id, name, nutriscore, novaGroupString, brand, frontImageUrl, tags, allergens, ingredients, categories);
 
     }
 
@@ -287,15 +290,11 @@ public class ProductJsonFactory {
     }
 
     private List<String> getCategoriesList(String categoriesString) {
-        List<Category> categories = new ArrayList<>();
-
-        List<String> categoriesStringList = Arrays.stream(
+        return Arrays.stream(
                 categoriesString.split(","))
                 .map(String::trim)
                 .map(s -> s.startsWith("en:") ? s.substring(3) : s)
                 .toList();
-
-        return categoriesStringList;
     }
 
     private List<Category> saveCategories(List<String> categoriesStringList) {

@@ -74,12 +74,12 @@ public class AchievementService {
                         unlockedAchievement.ifPresent(unlockedAchievements::add);
                     }
                     break;
-//                case NOVA_SCORE:
-//                    if (product.getNovaGroup().equals(achievementDefinition.getAchievementParameter())) {
-//                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
-//                        unlockedAchievement.ifPresent(unlockedAchievements::add);
-//                    }
-//                    break;
+                case NOVA_SCORE:
+                    if (product.getNovaGroup().equals(achievementDefinition.getAchievementParameter())) {
+                        Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
+                        unlockedAchievement.ifPresent(unlockedAchievements::add);
+                    }
+                    break;
                 default:
                     break;
             }

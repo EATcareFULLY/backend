@@ -25,6 +25,8 @@ public class Product {
 
     private String score;
 
+    private String novaGroup;
+
     private String brand;
 
     private String imageURL;
