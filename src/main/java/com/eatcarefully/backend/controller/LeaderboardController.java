@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +18,19 @@ public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
 
+    //mock data for now TODO: implement actual leaderboard
     @GetMapping("/me")
-    public ResponseEntity<LeaderboardDTO> getTestLeaderboard(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(leaderboardService.getTestLeaderboard(jwt));   //mock data for now
+    public ResponseEntity<LeaderboardDTO> getLeaderboard(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(leaderboardService.getTestLeaderboard(jwt));
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<LeaderboardDTO> getLeaderboardForUser(@PathVariable String username) {
+        return ResponseEntity.ok(leaderboardService.getLeaderboardForUser(username));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<LeaderboardDTO> getEntireLeaderboard(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(leaderboardService.getEntireLeaderboard(jwt));
     }
 }

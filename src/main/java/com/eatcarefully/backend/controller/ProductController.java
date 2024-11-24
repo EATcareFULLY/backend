@@ -8,8 +8,6 @@ import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +26,7 @@ public class ProductController {
     private final ImageHelper imageHelper;
 
     @GetMapping("/{barcode}")
-    public ResponseEntity<ScanResponseDTO> getProductDetailsByBarcode(@AuthenticationPrincipal Jwt jwt, @PathVariable String barcode) {
+    public ResponseEntity<ScanResponseDTO> getProductDetailsByBarcode(@PathVariable String barcode) {
 
         ScanResponseDTO scanResponse = productService.getProductDetails(barcode);
 
@@ -64,7 +62,7 @@ public class ProductController {
     }
 
     @PostMapping("/eval-label")
-    public ResponseEntity<?> getLabelEvaluation(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> getLabelEvaluation(@RequestParam("file") MultipartFile file) {
 
         try {
 
