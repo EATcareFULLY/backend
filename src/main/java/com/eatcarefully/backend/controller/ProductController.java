@@ -6,7 +6,6 @@ import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +30,7 @@ public class ProductController {
     @GetMapping("/{barcode}")
     public ResponseEntity<ScanResponseDTO> getProductDetailsByBarcode(@AuthenticationPrincipal Jwt jwt, @PathVariable String barcode) {
 
-        ScanResponseDTO scanResponse = productService.getProductDetails(jwt, barcode);
+        ScanResponseDTO scanResponse = productService.getProductDetails(barcode);
 
         return ResponseEntity.ok(
                 Objects.requireNonNullElseGet(scanResponse, this::dummyReturnProduct)
@@ -95,6 +94,6 @@ public class ProductController {
     }
 
     private ScanResponseDTO dummyReturnProduct() {
-        return new ScanResponseDTO("0", null, null, null, null, null, null, null, null);
+        return new ScanResponseDTO("0", null, null, null, null, null, null, null);
     }
 }

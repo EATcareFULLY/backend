@@ -10,8 +10,6 @@ public record ScanResponseDTO(
         String imageURL,
         List<TagDTO> tags,
         List<AllergenDTO> allergens,
-        List<IngredientDTO> ingredients,
-
-        List<AchievementDTO> newAchievements
+        List<IngredientDTO> ingredients
 ) {
 }

@@ -1,8 +1,6 @@
 package com.eatcarefully.backend.service;
 
-import com.eatcarefully.backend.dto.AchievementDTO;
 import com.eatcarefully.backend.dto.ScanResponseDTO;
-import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.helper.ProductJsonFactory;
 import com.eatcarefully.backend.model.Allergen;
 import com.eatcarefully.backend.model.Ingredient;
@@ -12,10 +10,8 @@ import com.eatcarefully.backend.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,7 +19,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -35,66 +31,14 @@ public class ProductService {
 
     private final ProductJsonFactory productJsonFactory;
 
-    private final AchievementService achievementService;
-
-    private final JwtHelper jwtHelper;
 
     //it stays
 
     // not for processing json response
 
-    public ScanResponseDTO getProductDetails(Jwt jwt, String barcode){
-        String username = jwtHelper.getUsernameFromToken(jwt);
-        List<AchievementDTO> newAchievements = new ArrayList<>();
-
-        ProductService proxy = (ProductService) AopContext.currentProxy();
-        Product product = proxy.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode);
-
-        if(product == null){
-            return null;
-        } else {
-            Optional<AchievementDTO> newAchievementOptional = achievementService.incrementAchievementProgress(username, 1L, 1);
-            newAchievementOptional.ifPresent(newAchievements::add);
-            return toScanResponseDTO(product, newAchievements);
-        }
-
-    }
-
     // this method will try to fetch product from OpenFoodFacts if not found in database
-
-//    @Cacheable(cacheNames = "products", key = "#barcode")
-//    public ScanResponseDTO getProductByBarcodeFromDatabaseOrOpenFoodFacts(Jwt jwt, String barcode) {
-//        String username = jwtHelper.getUsernameFromToken(jwt);
-//        List<AchievementDTO> newAchievements = new ArrayList<>();
-//
-//        Optional<Product> product = productRepository.findById(barcode);
-//        if(product.isEmpty()) {
-//
-//            try {
-//                JSONObject openFoodFactAPIResponse = getOpenFoodFactsAPIResponse(barcode);
-//                Product productFromJson = productJsonFactory.parseJSONToProduct(openFoodFactAPIResponse);
-//
-//                if(productFromJson == null){
-//                    return null;
-//                } else {
-//                    productRepository.save(productFromJson);
-//                    Optional<AchievementDTO> newAchievementOptional = achievementService.incrementAchievementProgress(username, 0L, 1);
-//                    newAchievementOptional.ifPresent(newAchievements::add);
-//                    return toScanResponseDTO(productFromJson, newAchievements);
-//                }
-//
-//            } catch (IOException | InterruptedException | NoSuchFieldException e) {
-//                return null;
-//            }
-//
-//        } else {
-//            Optional<AchievementDTO> newAchievementOptional = achievementService.incrementAchievementProgress(username, 0L, 1);
-//            newAchievementOptional.ifPresent(newAchievements::add);
-//            return toScanResponseDTO(product.get(), newAchievements);
-//        }
-//    }
     @Cacheable(cacheNames = "products", key = "#barcode")
-    public Product getProductByBarcodeFromDatabaseOrOpenFoodFacts(String barcode) {
+    public ScanResponseDTO getProductDetails(String barcode) {
         Optional<Product> product = productRepository.findById(barcode);
         if(product.isEmpty()) {
 
@@ -108,7 +52,7 @@ public class ProductService {
                 }
                 else {
                     productRepository.save(productFromJson);
-                    return productFromJson;
+                    return toScanResponseDTO(productFromJson);
                 }
 
 
@@ -118,7 +62,7 @@ public class ProductService {
 
 
         } else {
-            return product.get();
+            return toScanResponseDTO(product.get());
         }
     }
 
@@ -170,7 +114,7 @@ public class ProductService {
     }
 
 
-    private ScanResponseDTO toScanResponseDTO(Product product, List<AchievementDTO> newAchievements){
+    private ScanResponseDTO toScanResponseDTO(Product product) {
         return new ScanResponseDTO(
                 product.getId(),
                 product.getName(),
@@ -179,8 +123,7 @@ public class ProductService {
                 product.getImageURL(),
                 product.getTags().stream().map(Tag::toDTO).toList(),
                 product.getAllergens().stream().map(Allergen::toDTO).toList(),
-                product.getIngredients().stream().map(Ingredient::toDTO).toList(),
-                newAchievements
+                product.getIngredients().stream().map(Ingredient::toDTO).toList()
         );
     }
 
