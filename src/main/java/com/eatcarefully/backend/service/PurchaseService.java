@@ -1,7 +1,6 @@
 package com.eatcarefully.backend.service;
 
-import com.eatcarefully.backend.controller.PurchaseRequest;
-import com.eatcarefully.backend.dto.AchievementDTO;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.*;
@@ -25,29 +24,29 @@ public class PurchaseService {
     private final JwtHelper jwtHelper;
     private final AchievementService achievementService;
 
-    public void addPurchaseItem(Jwt jwt, PurchaseRequest purchaseRequest) {
+    public void addPurchaseItem(Jwt jwt, PurchaseRequestDTO purchaseRequestDTO) {
         String username = jwtHelper.getUsernameFromToken(jwt);
 
         // get or create purchase
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
 
         // get product
-        Product product = productService.getProductByBarcodeFromDatabase(purchaseRequest.getBarcode());
+        Product product = productService.getProductByBarcodeFromDatabase(purchaseRequestDTO.getBarcode());
 
         // alter and add purchase item
         if( product != null){
 
-            Optional<PurchaseItem> purchaseItemOptional = purchase.getPurchaseItemByBarcode(purchaseRequest.getBarcode());
+            Optional<PurchaseItem> purchaseItemOptional = purchase.getPurchaseItemByBarcode(purchaseRequestDTO.getBarcode());
 
             if(purchaseItemOptional.isPresent()){
 
                 PurchaseItem item = purchaseItemOptional.get();
-                item.setQuantity(item.getQuantity() + purchaseRequest.getQuantity());
+                item.setQuantity(item.getQuantity() + purchaseRequestDTO.getQuantity());
 
             } else {
                 PurchaseItem newItem = new PurchaseItem();
                 newItem.setProduct(product);
-                newItem.setQuantity(purchaseRequest.getQuantity());
+                newItem.setQuantity(purchaseRequestDTO.getQuantity());
                 purchase.addPurchaseItem(newItem);
             }
             purchaseRepository.save(purchase);

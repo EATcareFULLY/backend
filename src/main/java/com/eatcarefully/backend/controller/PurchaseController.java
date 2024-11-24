@@ -1,6 +1,7 @@
 package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +31,7 @@ public class PurchaseController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
+    public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequestDTO purchaseRequest) {
         if (purchaseRequest.getQuantity() <= 0) {
             return ResponseEntity.badRequest().body("Quantity must be greater than 0");
         }
