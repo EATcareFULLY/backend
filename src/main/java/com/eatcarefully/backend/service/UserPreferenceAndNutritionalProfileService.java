@@ -36,10 +36,10 @@ public class UserPreferenceAndNutritionalProfileService {
 
         UserNutritionalProfile profile = new UserNutritionalProfile(
                 username,
-                dto.getFatThreshold(),
-                dto.getProteinThreshold(),
-                dto.getCarbohydratesThreshold(),
-                dto.getCaloriesThreshold()
+                dto.getFat_threshold(),
+                dto.getProtein_threshold(),
+                dto.getCarbon_threshold(),
+                dto.getCalorie_threshold()
         );
 
         return userNutritionalProfileRepository.save(profile);
@@ -74,10 +74,10 @@ public class UserPreferenceAndNutritionalProfileService {
 
     public void updateNutritionalProfileThresholds(UserNutritionalProfile profile, NutritionalThresholdsDTO dto){
 
-        profile.setFatThreshold(dto.getFatThreshold());
-        profile.setProteinThreshold(dto.getProteinThreshold());
-        profile.setCarbohydratesThreshold(dto.getCarbohydratesThreshold());
-        profile.setCaloriesThreshold(dto.getCaloriesThreshold());
+        profile.setFatThreshold(dto.getFat_threshold());
+        profile.setProteinThreshold(dto.getProtein_threshold());
+        profile.setCarbohydratesThreshold(dto.getCarbon_threshold());
+        profile.setCaloriesThreshold(dto.getCalorie_threshold());
 
         userNutritionalProfileRepository.save(profile);
 

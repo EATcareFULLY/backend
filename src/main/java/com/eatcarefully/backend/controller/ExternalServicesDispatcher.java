@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
@@ -35,7 +36,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ExternalServicesDispatcher {
 
-    private final int N_RECOMMENDATION_PRODUCTS = 3;
+    private final int N_RECOMMENDATION_LIMIT = 3;
     private ILabelAnalysisClient labelAnalysisClient;
     private ImageHelper imageHelper;
     private OCRService ocrService;
@@ -107,7 +108,7 @@ public class ExternalServicesDispatcher {
     // history analysis
 
     @GetMapping("/history-analysis")
-    public Mono<JsonNode> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt){
+    public Mono<ResponseEntity<MultiValueMap<String, Object>>> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt){
 
         List<HistoryAnalysisProductDTO> historyProducts = purchaseService.getDataForHistoryAnalysis(jwt);
 
@@ -132,14 +133,14 @@ public class ExternalServicesDispatcher {
 
         String username = jwtHelper.getUsernameFromToken(jwt);
 
-        List<String> productsBarcodes = purchaseService.getBarcodesFromLeastHealthyProductsPurchasedOn(username, date,  N_RECOMMENDATION_PRODUCTS);
+        String productBarcode = purchaseService.getBarcodeFromLeastHealthyProductPurchasedOn(username, date);
 
-        if(productsBarcodes.isEmpty())
+        if(productBarcode.isEmpty())
             throw new DataNotFoundException("No product purchased by user:" + username + " on " + date);
 
         List<UserPreferenceDTO> preferences = preferencesService.getUserPreferencesList(username);
 
-        return recommendationSystemClient.submitProductsForRecommendation(new RecommendationRequestDTO(productsBarcodes, preferences));
+        return recommendationSystemClient.submitProductsForRecommendation(new RecommendationRequestDTO(productBarcode, N_RECOMMENDATION_LIMIT, preferences));
 
 
     }

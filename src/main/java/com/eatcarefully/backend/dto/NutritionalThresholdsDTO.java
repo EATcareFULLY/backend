@@ -14,19 +14,19 @@ public class NutritionalThresholdsDTO {
 
     @Min(0)
     @Max(100)
-    private int fatThreshold;
+    private int fat_threshold;
 
     @Min(0)
     @Max(100)
-    private int proteinThreshold;
+    private int protein_threshold;
 
     @Min(0)
     @Max(100)
-    private int carbohydratesThreshold;
+    private int carbon_threshold;
 
     @Min(0)
     @Max(100)
-    private int caloriesThreshold;
+    private int calorie_threshold;
 
 
 

@@ -138,7 +138,7 @@ public class PurchaseService {
     }
 
 
-    public List<String> getBarcodesFromLeastHealthyProductsPurchasedOn(String username, LocalDate date, int barcodesNum){
+    public String getBarcodeFromLeastHealthyProductPurchasedOn(String username, LocalDate date){
 
         Purchase purchase = purchaseRepository.findByUsernameAndPurchaseDate(username, date).orElse(null);
 
@@ -149,7 +149,7 @@ public class PurchaseService {
 
         purchasesProducts.sort( (p1,p2) -> p2.getScore().compareTo(p1.getScore()));
 
-        return purchasesProducts.stream().limit(barcodesNum).map(Product::getId).toList();
+        return purchasesProducts.stream().findFirst().orElse(null).getId();
 
 
     }

@@ -10,8 +10,9 @@ import java.util.List;
 public class RecommendationRequestDTO {
 
 
-    private List<String> barcodes;
-    private List<UserPreferenceDTO> preferences;
+    private String product_code;
+    private int limit= 3;
+    private List<UserPreferenceDTO> user_preferences;
 
 
 }

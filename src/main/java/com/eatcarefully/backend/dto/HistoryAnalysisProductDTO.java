@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class HistoryAnalysisProductDTO {
 
-    private String barcode;
+    private String code;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;

@@ -13,6 +13,6 @@ import java.util.List;
 public class HistoryAnalysisRequestDTO {
 
     private List<HistoryAnalysisProductDTO> products;
-    private NutritionalThresholdsDTO thresholds;
+    private NutritionalThresholdsDTO preferences;
 
 }
