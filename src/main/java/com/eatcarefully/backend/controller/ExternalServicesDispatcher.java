@@ -7,6 +7,7 @@ import com.eatcarefully.backend.exceptions.ModelValidationException;
 import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
 import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.helper.JwtHelper;
+import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.service.OCRService;
 import com.eatcarefully.backend.service.PurchaseService;
 import com.eatcarefully.backend.service.UserPreferenceAndNutritionalProfileService;
@@ -27,8 +28,10 @@ import reactor.core.publisher.Mono;
 
 import java.net.http.HttpTimeoutException;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -108,19 +111,29 @@ public class ExternalServicesDispatcher {
     // history analysis
 
     @GetMapping("/history-analysis")
-    public Mono<ResponseEntity<MultiValueMap<String, Object>>> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt){
+    public Mono<ResponseEntity<MultiValueMap<String, Object>>> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt, @RequestParam int year, @RequestParam int month){
 
-        List<HistoryAnalysisProductDTO> historyProducts = purchaseService.getDataForHistoryAnalysis(jwt);
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate firstDay = yearMonth.atDay(1);
+        LocalDate endDay = yearMonth.atEndOfMonth();
 
         String username = jwtHelper.getUsernameFromToken(jwt);
 
+
+        List<Purchase> purchases = purchaseService.getPurchasesBetween(username, firstDay, endDay );
+
+        List<HistoryAnalysisProductDTO> products = purchases.stream()
+                .map(Purchase::toListOfHistoryAnalysisProductDTO)
+                .flatMap(List::stream).
+                collect(Collectors.toList());
+
         NutritionalThresholdsDTO thresholds = preferencesService.getUserThresholds(username);
 
-        if(historyProducts.isEmpty()  || thresholds == null)
+        if(purchases.isEmpty()  || thresholds == null)
             return Mono.error(new DataNotFoundException("No data for history analysis"));
 
         return historyAnalysisClient.submitProductsForHistoryAnalysis(new HistoryAnalysisRequestDTO(
-                historyProducts,
+                products,
                 thresholds
         ));
 

@@ -155,6 +155,13 @@ public class PurchaseService {
     }
 
 
+    public List<Purchase> getPurchasesBetween(String username, LocalDate startDate, LocalDate endName){
+
+        return purchaseRepository.findByUsernameAndPurchaseDateBetween(username, startDate, endName);
+
+    }
+
+
 
 
 
