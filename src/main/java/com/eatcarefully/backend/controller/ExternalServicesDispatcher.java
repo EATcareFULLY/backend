@@ -17,6 +17,8 @@ import com.eatcarefully.backend.service.external.IRecommendationSystemClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.handler.timeout.TimeoutException;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -111,7 +113,7 @@ public class ExternalServicesDispatcher {
     // history analysis
 
     @GetMapping("/history-analysis")
-    public Mono<ResponseEntity<MultiValueMap<String, Object>>> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt, @RequestParam int year, @RequestParam int month){
+    public Mono<ResponseEntity<ByteArrayResource>> handleHistoryAnalysisRequest(@AuthenticationPrincipal Jwt jwt, @RequestParam int year, @RequestParam int month){
 
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate firstDay = yearMonth.atDay(1);
@@ -133,6 +135,8 @@ public class ExternalServicesDispatcher {
             return Mono.error(new DataNotFoundException("No data for history analysis"));
 
         return historyAnalysisClient.submitProductsForHistoryAnalysis(new HistoryAnalysisRequestDTO(
+                month,
+                year,
                 products,
                 thresholds
         ));

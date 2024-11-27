@@ -12,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 public class HistoryAnalysisRequestDTO {
 
+    private int month;
+    private int year;
     private List<HistoryAnalysisProductDTO> products;
     private NutritionalThresholdsDTO preferences;
 
