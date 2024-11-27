@@ -12,20 +12,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NutritionalThresholdsDTO {
 
-    @Min(0)
-    @Max(100)
+    @Min(8)
+    @Max(222)
     private int fat_threshold;
 
-    @Min(0)
-    @Max(100)
+    @Min(6)
+    @Max(500)
     private int protein_threshold;
 
-    @Min(0)
-    @Max(100)
+    @Min(50)
+    @Max(875)
     private int carbon_threshold;
 
-    @Min(0)
-    @Max(100)
+    @Min(500)
+    @Max(5000)
     private int calorie_threshold;
 
 
