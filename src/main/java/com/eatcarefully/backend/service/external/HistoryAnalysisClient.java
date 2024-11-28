@@ -30,7 +30,7 @@ import java.util.concurrent.TimeoutException;
 public class HistoryAnalysisClient implements IHistoryAnalysisClient{
 
 
-    private final String url = "url";
+    private final String url = "http://localhost:8000/analyze/";
     private final WebClient webClient = WebClient.create();
     private final Duration TIMEOUT_IN_SECONDS  = Duration.ofSeconds(10);
 
@@ -51,34 +51,23 @@ public class HistoryAnalysisClient implements IHistoryAnalysisClient{
                             response.bodyToMono(String.class)
                                     .flatMap(errorBody -> Mono.error(new ValidationException("Validation error: " + errorBody)))
                     )
-                    .toEntity(MultiValueMap.class)
-                    .flatMap( responseEntity -> {
-
-                        MultiValueMap<String, HttpEntity<?>> body = responseEntity.getBody();
-
-                        // JSON
-                        if (body == null) {
-                            return Mono.error(new DataNotFoundException("Missing body in response"));
+                    .bodyToMono(byte[].class) // Directly get the response body as byte[]
+                    .flatMap(pdfContent -> {
+                        if (pdfContent == null || pdfContent.length == 0) {
+                            return Mono.error(new DataNotFoundException("PDF content is missing or empty"));
                         }
 
-                        //PDF
-                        HttpEntity<?> pdfEntity = body.getFirst("pdf");
-                        if (pdfEntity == null || pdfEntity.getBody() == null) {
-                            return Mono.error(new IllegalStateException("PDF part of response is missing."));
-                        }
+                        // Wrap PDF content in a ByteArrayResource with a filename
+                        ByteArrayResource pdfResource = new ByteArrayResource(pdfContent) {
+                            @Override
+                            public String getFilename() {
+                                return "history_analysis.pdf";
+                            }
+                        };
 
-                        byte[] pdfContent;
-                        if (pdfEntity.getBody() instanceof byte[]) {
-                            pdfContent = (byte[]) pdfEntity.getBody();
-                        } else {
-
-                            return Mono.error(new IllegalArgumentException("Unexpected type for PDF part in response"));
-                        }
-
-                        // build response
-                        ByteArrayResource pdfResource = new ByteArrayResource(pdfContent);
-                        return Mono.just(ResponseEntity.ok(pdfResource));
-
+                        return Mono.just(ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_PDF)
+                                .body(pdfResource));
                     })
                     .timeout(TIMEOUT_IN_SECONDS)
                     .onErrorMap(TimeoutException.class, e ->
