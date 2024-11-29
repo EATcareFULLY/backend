@@ -11,7 +11,7 @@ public class RecommendationRequestDTO {
 
 
     private String product_code;
-    private int limit= 3;
+    private int limit;
     private List<UserPreferenceDTO> user_preferences;
 
 

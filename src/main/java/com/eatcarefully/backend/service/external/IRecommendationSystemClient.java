@@ -6,9 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface IRecommendationSystemClient {
 
-    public Mono<String> submitProductsForRecommendation(RecommendationRequestDTO dto);
-
-    public Mono<JsonNode> getRecommendationResults(String recommendationId);
+    public Mono<JsonNode> submitProductsForRecommendation(RecommendationRequestDTO dto);
 
 
 }

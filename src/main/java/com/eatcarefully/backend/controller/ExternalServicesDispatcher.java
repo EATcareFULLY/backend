@@ -146,7 +146,7 @@ public class ExternalServicesDispatcher {
     // recommendation system
 
     @PostMapping("/recommendation-system")
-    public Mono<String> handleSubmittingProductsForRecommendation(@AuthenticationPrincipal Jwt jwt, LocalDate date){
+    public Mono<JsonNode> handleSubmittingProductsForRecommendation(@AuthenticationPrincipal Jwt jwt, LocalDate date){
 
         String username = jwtHelper.getUsernameFromToken(jwt);
 
@@ -163,11 +163,6 @@ public class ExternalServicesDispatcher {
     }
 
 
-    @GetMapping("/recommendation-system")
-    public Mono<JsonNode> getRecommendationsResult(String recommendationId){
-
-        return recommendationSystemClient.getRecommendationResults(recommendationId);
-    }
 
 
 
