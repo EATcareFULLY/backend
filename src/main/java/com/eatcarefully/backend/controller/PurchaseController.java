@@ -1,6 +1,8 @@
 package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
+import com.eatcarefully.backend.dto.PurchaseResponseDTO;
 import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/purchases")
@@ -30,15 +33,21 @@ public class PurchaseController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
-        if (purchaseRequest.getQuantity() <= 0)
-            return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
+    public ResponseEntity<PurchaseResponseDTO> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequestDTO purchaseRequest) {
+        if (purchaseRequest.getQuantity() <= 0) {
+            PurchaseResponseDTO badRequestObject = new PurchaseResponseDTO(null, "Quantity must be greater than 0");
+            return ResponseEntity.badRequest().body(badRequestObject);
+        }
 
+        PurchaseResponseDTO result = shoppingService.addPurchaseItem(jwt, purchaseRequest);
 
-        shoppingService.addPurchaseItem(jwt, purchaseRequest);
-        return ResponseEntity.ok("Purchase added successfully");
+        if(Objects.isNull(result)){
+            PurchaseResponseDTO internalErrorObject = new PurchaseResponseDTO(null, "Error while fetching product: product not present in the database.");
+            return ResponseEntity.internalServerError().body(internalErrorObject);
+        } else {
+            return ResponseEntity.ok(result);
+        }
     }
-
 
 
     @GetMapping("/all")

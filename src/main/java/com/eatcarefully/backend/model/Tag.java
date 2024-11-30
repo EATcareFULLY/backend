@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.TagDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,4 +22,8 @@ public class Tag {
     private Long id;
 
     private String name;
+
+    public TagDTO toDTO(){
+        return new TagDTO(name);
+    }
 }

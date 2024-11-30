@@ -2,6 +2,8 @@ package com.eatcarefully.backend;
 
 
 import com.eatcarefully.backend.controller.ProductController;
+import com.eatcarefully.backend.dto.ScanResponseDTO;
+import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,10 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
@@ -28,6 +30,9 @@ public class ProductControllerTest {
     @MockBean
     private ProductService productService;
 
+    @MockBean
+    private ImageHelper imageHelper;
+
 
 
     // product details
@@ -36,9 +41,9 @@ public class ProductControllerTest {
     public void Should_ReturnProductDetails_When_ProductExists() throws Exception{
 
         String barcode = "11111111";
-        Product product = new Product(barcode, "test","test","test","test", null, null, null);
+        ScanResponseDTO scanResponseDTO = new ScanResponseDTO(barcode, "test","test","test","test", null, null, null, null);
 
-        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode)).thenReturn(product);
+        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(any(), any())).thenReturn(scanResponseDTO);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -53,7 +58,7 @@ public class ProductControllerTest {
 
         String barcode = "not_valid";
 
-        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode)).thenReturn(null);
+        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(any(), any())).thenReturn(null);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))

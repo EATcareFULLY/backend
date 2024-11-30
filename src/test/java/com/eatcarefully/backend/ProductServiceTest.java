@@ -1,15 +1,17 @@
 package com.eatcarefully.backend;
 
+import com.eatcarefully.backend.dto.ScanResponseDTO;
+import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.helper.ProductJsonFactory;
+import com.eatcarefully.backend.service.AchievementService;
 import com.eatcarefully.backend.service.ProductService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -17,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 
@@ -27,6 +30,7 @@ public class ProductServiceTest {
 
     private static final String VALID_BARCODE_IN_DB = "22222222";
     private static final String INVALID_BARCODE = "notValid";
+    private static final String TEST_USERNAME = "testuser";
 
     @InjectMocks
     private ProductService productService;
@@ -36,6 +40,12 @@ public class ProductServiceTest {
 
     @Mock
     private static ProductJsonFactory productJsonFactory;
+
+    @Mock
+    private static AchievementService achievementService;
+
+    @Mock
+    private static JwtHelper jwtHelper;
 
 
 
@@ -50,7 +60,9 @@ public class ProductServiceTest {
         when(productRepository.findById(INVALID_BARCODE)).thenReturn(emptyProductOptional);
         when(productRepository.findById(VALID_BARCODE_NOT_IN_DB)).thenReturn(emptyProductOptional);
         when(productRepository.findById(VALID_BARCODE_IN_DB)).thenReturn(productOptional);
-        when(productJsonFactory.parseJSONToProduct(Mockito.any(JSONObject.class))).thenAnswer(
+        when(achievementService.incrementAchievementProgress(any(), anyLong(), anyInt())).thenReturn(Optional.empty());
+        when(jwtHelper.getUsernameFromToken(any())).thenReturn(TEST_USERNAME);
+        when(productJsonFactory.parseJSONToProduct(any(JSONObject.class))).thenAnswer(
                 new Answer<Product>(){
 
                     @Override
@@ -101,9 +113,9 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnNull_When_ProductIsNotFoundInDatabaseNorOpenFoodFacts(){
 
-        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(INVALID_BARCODE);
+        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null,INVALID_BARCODE);
 
-        assertNull(product);
+        assertNull(scanResponse);
 
     }
 
@@ -111,10 +123,10 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnProduct_When_ProductIsFoundInDatabaseNotOpenFoodFacts(){
 
-        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(VALID_BARCODE_IN_DB);
+        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null, VALID_BARCODE_IN_DB);
 
-        assertNotNull(product);
-        assertEquals(VALID_BARCODE_IN_DB, product.getId());
+        assertNotNull(scanResponse);
+        assertEquals(VALID_BARCODE_IN_DB, scanResponse.id());
 
     }
 
@@ -122,9 +134,9 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnProduct_When_ProductIsNotFoundInDatabaseButInOpenFoodFacts(){
 
-        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(VALID_BARCODE_NOT_IN_DB);
+        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null, VALID_BARCODE_NOT_IN_DB);
 
-        assertNotNull(product);
+        assertNotNull(scanResponse);
 
     }
 

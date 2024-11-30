@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.AllergenDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,4 +21,8 @@ public class Allergen {
     private Long id;
 
     private String name;
+
+    public AllergenDTO toDTO(){
+        return new AllergenDTO(name);
+    }
 }

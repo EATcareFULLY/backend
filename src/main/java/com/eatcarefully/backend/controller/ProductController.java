@@ -1,11 +1,11 @@
 package com.eatcarefully.backend.controller;
 
 import com.eatcarefully.backend.dto.ProductRecommendationDTO;
+import com.eatcarefully.backend.dto.ScanResponseDTO;
 import com.eatcarefully.backend.helper.ImageHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.service.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/products")
@@ -26,31 +26,25 @@ public class ProductController {
     private final ImageHelper imageHelper;
 
     @GetMapping("/{barcode}")
-    @Cacheable( cacheNames = "products_resp", key = "#barcode")
-    public ResponseEntity<?> getProductDetailsByBarcode(@PathVariable String barcode) {
+    public ResponseEntity<ScanResponseDTO> getProductDetailsByBarcode(@PathVariable String barcode) {
 
-        Product product = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(barcode);
+        ScanResponseDTO scanResponse = productService.getProductDetails(barcode);
 
-        if(product == null) {
-            Product temp = new Product();
-            temp.setId("0");
-            return ResponseEntity.ok(temp);
-        }
-        else
-            return ResponseEntity.ok(product);
-
+        return ResponseEntity.ok(
+                Objects.requireNonNullElseGet(scanResponse, this::dummyReturnProduct)
+        );
     }
 
     // mock endpoint for recommendation system
 
     @GetMapping("/{barcode}/recommend")
-    public ResponseEntity<?> getProductRecommendationByBarcode(@PathVariable String barcode){
+    public ResponseEntity<?> getProductRecommendationByBarcode(@PathVariable String barcode) {
 
         Product product = productService.getProductByBarcodeFromDatabase(barcode);
 
         //mock products to recommend
 
-        if( product != null){
+        if (product != null) {
 
             String testingPossumUrl = "https://i.pinimg.com/474x/84/6f/85/846f8591330851c3ba9e11c3ea1afaa8.jpg";
             List<ProductRecommendationDTO> recommendations = List.of(
@@ -61,18 +55,18 @@ public class ProductController {
 
             return ResponseEntity.ok(recommendations);
 
-            }
+        }
 
         return ResponseEntity.notFound().build();
 
-        }
+    }
 
     @PostMapping("/eval-label")
-    public ResponseEntity<?> getLabelEvaluation(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> getLabelEvaluation(@RequestParam("file") MultipartFile file) {
 
         try {
 
-            if( file == null || file.isEmpty())
+            if (file == null || file.isEmpty())
                 return ResponseEntity.badRequest().build();
 
             // check file extension
@@ -88,19 +82,16 @@ public class ProductController {
                 String eval = String.format("File size: %d x %d px", width, height);
 
                 return ResponseEntity.ok(eval);
-            }
-            else
+            } else
                 return ResponseEntity.badRequest().build();
 
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
         }
-
-
-
     }
 
-
-
+    private ScanResponseDTO dummyReturnProduct() {
+        return new ScanResponseDTO("0", null, null, null, null, null, null, null);
+    }
 }
