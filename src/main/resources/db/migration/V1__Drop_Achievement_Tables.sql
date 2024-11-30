@@ -1,2 +1,2 @@
-DROP TABLE achievement_progress;
-DROP TABLE achievement_definition;
+DROP TABLE IF EXISTS achievement_progress;
+DROP TABLE IF EXISTS achievement_definition;

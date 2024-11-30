@@ -75,7 +75,7 @@ public class AchievementService {
                     }
                     break;
                 case NOVA_SCORE:
-                    if (product.getNovaGroup().equals(achievementDefinition.getAchievementParameter())) {
+                    if (achievementDefinition.getAchievementParameter().equals(product.getNovaGroup())) {
                         Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
                         unlockedAchievement.ifPresent(unlockedAchievements::add);
                     }
