@@ -140,11 +140,4 @@ public class AchievementService {
             );
         }
     }
-
-
-//    public List<AchievementDTO> verifyPurchaseAchievements(String username, Product purchasedProduct) {
-//        List<String> categories = purchasedProduct.getCategories().stream().map(Category::getName).toList();
-//
-//        // ify z każdą kategorią
-//    }
 }
