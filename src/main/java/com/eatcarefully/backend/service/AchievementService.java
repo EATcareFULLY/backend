@@ -50,14 +50,14 @@ public class AchievementService {
 
         for (AchievementDefinition achievementDefinition : achievementDefinitions) {
             switch (achievementDefinition.getAchievementType()) {
-                case PRODUCT_CATEGORY:  //TODO: handle categories in different languages
+                case PRODUCT_CATEGORY:
                     if (product.getCategories().stream().anyMatch(category -> category.getName().equals(achievementDefinition.getAchievementParameter()))) {
                         Optional<AchievementDTO> unlockedAchievement = incrementAchievementProgress(username, achievementDefinition.getId(), 1);
                         unlockedAchievement.ifPresent(unlockedAchievements::add);
                     }
                     break;
                 case PRODUCT_NAME:
-                    // case insensitive search
+                    // case-insensitive search
                     String productName = product.getName().toLowerCase();
                     String searchedPhrase = achievementDefinition.getAchievementParameter().toLowerCase();
                     if (productName.contains(searchedPhrase)) {
@@ -119,7 +119,7 @@ public class AchievementService {
             if (levelAfterIncrement != progress.getCurrentLevel()) {
                 progress.setCurrentLevel(levelAfterIncrement);
                 progressRepository.save(progress);
-                return Optional.of(new AchievementDTO(definition.getName(), "Achievement Description Placeholder", levelAfterIncrement));
+                return Optional.of(new AchievementDTO(definition.getName(), definition.getDescription(), levelAfterIncrement));
             } else {
                 progressRepository.save(progress);
                 return Optional.empty();

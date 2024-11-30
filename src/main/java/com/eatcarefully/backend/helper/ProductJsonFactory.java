@@ -44,7 +44,7 @@ public class ProductJsonFactory {
         String nutriscore = nutriscoreObject != null ? getNutriscore(nutriscoreObject) : null;
 
         int novaGroup = productObject.optInt("nova_group");
-        String novaGroupString = novaGroup != 0 ? String.valueOf(novaGroup) : null;
+        String novaGroupString = novaGroup != 0 ? String.valueOf(novaGroup) : "unknown";
 
         JSONArray ingredientsArray = productObject.optJSONArray("ingredients");
         List<Ingredient> ingredients = ingredientsArray != null ? getIngredientsList(ingredientsArray) : List.of();
