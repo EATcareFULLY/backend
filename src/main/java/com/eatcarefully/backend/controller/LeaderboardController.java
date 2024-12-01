@@ -20,17 +20,17 @@ public class LeaderboardController {
 
     //mock data for now TODO: implement actual leaderboard
     @GetMapping("/me")
-    public ResponseEntity<LeaderboardDTO> getLeaderboard(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(leaderboardService.getTestLeaderboard(jwt));
+    public ResponseEntity<LeaderboardDTO> getLeaderboardForCurrentUser(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(leaderboardService.getLeaderboardForCurrentUser(jwt));
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<LeaderboardDTO> getLeaderboardForUser(@PathVariable String username) {
+    public ResponseEntity<LeaderboardDTO> getLeaderboardForSearchedUser(@PathVariable String username) {
         return ResponseEntity.ok(leaderboardService.getLeaderboardForUser(username));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<LeaderboardDTO> getEntireLeaderboard(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(leaderboardService.getEntireLeaderboard(jwt));
+    public ResponseEntity<LeaderboardDTO> getEntireLeaderboard() {
+        return ResponseEntity.ok(leaderboardService.getEntireLeaderboard());
     }
 }
