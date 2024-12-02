@@ -5,6 +5,7 @@ import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,7 @@ public class PurchaseController {
     }
 
     @PostMapping()
+    @CacheEvict(value = "purchases_resp", allEntries = true)
     public ResponseEntity<String> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequest purchaseRequest) {
         if (purchaseRequest.getQuantity() <= 0)
             return new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
