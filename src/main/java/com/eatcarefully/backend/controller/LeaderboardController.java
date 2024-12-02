@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/leaderboard")
 @RequiredArgsConstructor
@@ -26,7 +28,12 @@ public class LeaderboardController {
 
     @GetMapping("/{username}")
     public ResponseEntity<LeaderboardDTO> getLeaderboardForSearchedUser(@PathVariable String username) {
-        return ResponseEntity.ok(leaderboardService.getLeaderboardForUser(username));
+        LeaderboardDTO leaderboardForSearchedUser = leaderboardService.getLeaderboardForSearchedUser(username);
+        if (Objects.isNull(leaderboardForSearchedUser)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(leaderboardForSearchedUser);
+        }
     }
 
     @GetMapping("/all")

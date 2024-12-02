@@ -40,6 +40,15 @@ public class LeaderboardService {
         return getLeaderboardForUser(username);
     }
 
+    public LeaderboardDTO getLeaderboardForSearchedUser(String username) {
+        Optional<LeaderboardPosition> searchedUserPosition = leaderboardPositionRepository.findByUsername(username);
+        if (searchedUserPosition.isPresent()) {
+            return getLeaderboardForUser(username);
+        } else {
+            return null;
+        }
+    }
+
     public LeaderboardDTO getLeaderboardForUser(String username) {
         List<LeaderboardPosition> positionsSorted = leaderboardPositionRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
         int userPositionIndex = positionsSorted.indexOf(new LeaderboardPosition(null, username, null));
