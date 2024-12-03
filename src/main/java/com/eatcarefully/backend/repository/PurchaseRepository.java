@@ -16,4 +16,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     Page<Purchase> findByUsernameAndPurchaseDateBetween(String username, LocalDate start, LocalDate end, Pageable pageable);
     Optional<Purchase> findByUsernameAndPurchaseDate(String username, LocalDate purchaseDate);
 
+    List<Purchase> findByUsernameAndPurchaseDateBetween(String username, LocalDate start, LocalDate end);
+
 }

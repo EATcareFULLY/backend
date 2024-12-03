@@ -7,6 +7,7 @@ import com.eatcarefully.backend.dto.RemovePurchaseItemDTO;
 import com.eatcarefully.backend.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ public class PurchaseController {
     }
 
     @PostMapping()
+    @CacheEvict(value = "purchases_resp", allEntries = true)
     public ResponseEntity<PurchaseResponseDTO> addPurchase(@AuthenticationPrincipal Jwt jwt, @RequestBody PurchaseRequestDTO purchaseRequest) {
         if (purchaseRequest.getQuantity() <= 0) {
             PurchaseResponseDTO badRequestObject = new PurchaseResponseDTO(null, "Quantity must be greater than 0");
@@ -48,6 +50,7 @@ public class PurchaseController {
             return ResponseEntity.ok(result);
         }
     }
+
 
 
     @GetMapping("/all")

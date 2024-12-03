@@ -2,9 +2,9 @@ package com.eatcarefully.backend;
 
 import com.eatcarefully.backend.dto.ScanResponseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
+import com.eatcarefully.backend.helper.ProductJsonFactory;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.repository.ProductRepository;
-import com.eatcarefully.backend.helper.ProductJsonFactory;
 import com.eatcarefully.backend.service.AchievementService;
 import com.eatcarefully.backend.service.ProductService;
 import org.json.JSONObject;
@@ -113,7 +113,7 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnNull_When_ProductIsNotFoundInDatabaseNorOpenFoodFacts(){
 
-        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null,INVALID_BARCODE);
+        ScanResponseDTO scanResponse = productService.getProductDetails(INVALID_BARCODE);
 
         assertNull(scanResponse);
 
@@ -123,7 +123,7 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnProduct_When_ProductIsFoundInDatabaseNotOpenFoodFacts(){
 
-        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null, VALID_BARCODE_IN_DB);
+        ScanResponseDTO scanResponse = productService.getProductDetails(VALID_BARCODE_IN_DB);
 
         assertNotNull(scanResponse);
         assertEquals(VALID_BARCODE_IN_DB, scanResponse.id());
@@ -134,7 +134,7 @@ public class ProductServiceTest {
     @Test
     public void Should_ReturnProduct_When_ProductIsNotFoundInDatabaseButInOpenFoodFacts(){
 
-        ScanResponseDTO scanResponse = productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(null, VALID_BARCODE_NOT_IN_DB);
+        ScanResponseDTO scanResponse = productService.getProductDetails(VALID_BARCODE_NOT_IN_DB);
 
         assertNotNull(scanResponse);
 

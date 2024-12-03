@@ -1,9 +1,6 @@
 package com.eatcarefully.backend.service;
 
-import com.eatcarefully.backend.dto.AchievementDTO;
-import com.eatcarefully.backend.dto.PurchaseDTO;
-import com.eatcarefully.backend.dto.PurchaseRequestDTO;
-import com.eatcarefully.backend.dto.PurchaseResponseDTO;
+import com.eatcarefully.backend.dto.*;
 import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Purchase;
@@ -16,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -130,6 +128,47 @@ public class PurchaseService {
         return true;
 
     }
+
+    public List<HistoryAnalysisProductDTO> getDataForHistoryAnalysis(Jwt jwt){
+
+        String username = jwtHelper.getUsernameFromToken(jwt);
+        List<Purchase> purchases = purchaseRepository.findByUsername(username);
+
+        List<HistoryAnalysisProductDTO> mappedList = purchases.stream()
+                .map(Purchase::toListOfHistoryAnalysisProductDTO)
+                .flatMap(List::stream)
+                .toList();
+
+        return mappedList;
+
+    }
+
+
+    public String getBarcodeFromLeastHealthyProductPurchasedOn(String username, LocalDate date){
+
+        Purchase purchase = purchaseRepository.findByUsernameAndPurchaseDate(username, date).orElse(null);
+
+        if(purchase == null)
+            return null;
+
+        ArrayList<Product> purchasesProducts = new ArrayList<>(purchase.getPurchasedItems().stream().map(PurchaseItem::getProduct).toList());
+
+        purchasesProducts.sort( (p1,p2) -> p2.getScore().compareTo(p1.getScore()));
+
+        return purchasesProducts.stream().findFirst().orElse(null).getId();
+
+
+    }
+
+
+    public List<Purchase> getPurchasesBetween(String username, LocalDate startDate, LocalDate endName){
+
+        return purchaseRepository.findByUsernameAndPurchaseDateBetween(username, startDate, endName);
+
+    }
+
+
+
 
 
 }

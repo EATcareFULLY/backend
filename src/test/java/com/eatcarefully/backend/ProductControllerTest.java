@@ -41,9 +41,9 @@ public class ProductControllerTest {
     public void Should_ReturnProductDetails_When_ProductExists() throws Exception{
 
         String barcode = "11111111";
-        ScanResponseDTO scanResponseDTO = new ScanResponseDTO(barcode, "test","test","test","test", null, null, null, null);
+        ScanResponseDTO scanResponseDTO = new ScanResponseDTO(barcode, "testName", "testScore", "testBrand", "testUrl", null, null, null);
 
-        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(any(), any())).thenReturn(scanResponseDTO);
+        when(productService.getProductDetails(any())).thenReturn(scanResponseDTO);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                 .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -58,7 +58,7 @@ public class ProductControllerTest {
 
         String barcode = "not_valid";
 
-        when(productService.getProductByBarcodeFromDatabaseOrOpenFoodFacts(any(), any())).thenReturn(null);
+        when(productService.getProductDetails(any())).thenReturn(null);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}", barcode)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))
@@ -75,7 +75,7 @@ public class ProductControllerTest {
     public void Should_ReturnProductRecommendations_When_ProductExists() throws Exception{
 
         String barcode = "11111111";
-        Product product = new Product(barcode, "test","test","test","test", null, null, null);
+        Product product = new Product(barcode, "testName", "testNutriScore", "testNovaGroup", "testBrand", "testImageUrl", null, null, null, null);
 
         when(productService.getProductByBarcodeFromDatabase(barcode)).thenReturn(product);
 

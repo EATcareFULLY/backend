@@ -5,12 +5,12 @@ import com.eatcarefully.backend.repository.AllergenRepository;
 import com.eatcarefully.backend.repository.IngredientRepository;
 import com.eatcarefully.backend.repository.ProductRepository;
 import com.eatcarefully.backend.repository.TagRepository;
+import com.eatcarefully.backend.service.PreferenceNamesService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,6 +28,8 @@ public class TestController {
     private TagRepository tagRepository;
 
     private AllergenRepository allergenRepository;
+
+    private PreferenceNamesService preferenceNamesService;
 
     @GetMapping(path = "/hello")
     public ResponseEntity<String> helloWorld(){
@@ -315,6 +317,33 @@ public class TestController {
                         List.of(ingredients.get(2), ingredients.get(5), ingredients.get(8)),
                         List.of(condiments.get(0), condiments.get(4)))
         );
+    }
+
+
+
+    @PostMapping("create-preference-name")
+    public ResponseEntity<PreferenceName> createPreferenceName(@RequestParam String name){
+
+        try {
+            return ResponseEntity.ok(preferenceNamesService.createPreferenceName(name));
+
+        }
+        catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    @GetMapping("preference-name/all")
+    public ResponseEntity<List<String>> getAllPreferenceNames(){
+        return ResponseEntity.ok(preferenceNamesService.getAllPreferenceNames());
+    }
+
+
+    @DeleteMapping("preference-name")
+    public ResponseEntity<String> removePreferenceName(@RequestParam String name){
+        preferenceNamesService.removePreferenceName(name);
+        return ResponseEntity.ok("PreferenceName removed successfully");
     }
 
 
