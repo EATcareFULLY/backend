@@ -3,7 +3,6 @@ spring:
     name: backend
 
   # postgres as database
-
   datasource:
     url: jdbc:postgresql://localhost:6543/eatcarefully
     username: postgres
@@ -15,23 +14,12 @@ spring:
       ddl-auto: update
     show-sql: true
 
-  #TODO: could be useful for future testing
-
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driverClassName: org.h2.Driver
-#    username: sa
-#    password: password
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/eat-carefully
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
-    enabled: ${SECURITY_ENABLED:true}
 
   servlet:
     multipart:
@@ -43,6 +31,9 @@ spring:
     baseline-version: 0
     clean-disabled: ${FLYWAY_DISABLE_CLEAN:false}
     clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:true}
+
+security:
+  enabled: ${SECURITY_ENABLED:true}
 
 jwt:
   auth:
@@ -60,3 +51,4 @@ server:
 
 tesseract:
   path: ${TESSERACT_DATA_PATH:classpath:tessdata}
+

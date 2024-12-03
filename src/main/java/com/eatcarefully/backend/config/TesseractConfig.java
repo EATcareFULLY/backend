@@ -1,18 +1,16 @@
 package com.eatcarefully.backend.config;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-
 @Configuration
+@Slf4j
 public class TesseractConfig {
 
     @Value("${tesseract.path}")
@@ -31,13 +29,10 @@ public class TesseractConfig {
         ITesseract tesseract = new Tesseract();
 
         if (StringUtils.hasLength(tesseractPath)) {
-            try {
-                Resource resource = resourceLoader.getResource(tesseractPath);
-                String absolutePath = resource.getFile().getAbsolutePath();
-                tesseract.setDatapath(absolutePath);
-            } catch (IOException e) {
-                throw new BeanCreationException("Failed to initialize Tesseract with tessdata located in resources", e);
-            }
+            log.info("Setting tessdata path to: {}", tesseractPath);
+            tesseract.setDatapath(tesseractPath);
+        } else {
+            log.warn("No tessdata path configured!");
         }
 
         return tesseract;
