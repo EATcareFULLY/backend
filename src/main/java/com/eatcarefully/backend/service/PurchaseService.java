@@ -1,11 +1,13 @@
 package com.eatcarefully.backend.service;
 
 import com.eatcarefully.backend.dto.AchievementDTO;
-import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.PurchaseResponseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
-import com.eatcarefully.backend.model.*;
+import com.eatcarefully.backend.model.Product;
+import com.eatcarefully.backend.model.Purchase;
+import com.eatcarefully.backend.model.PurchaseItem;
 import com.eatcarefully.backend.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ public class PurchaseService {
     private final ProductService productService;
     private final JwtHelper jwtHelper;
     private final AchievementService achievementService;
+    private final LeaderboardService leaderboardService;
 
     public PurchaseResponseDTO addPurchaseItem(Jwt jwt, PurchaseRequestDTO purchaseRequestDTO) {
         String username = jwtHelper.getUsernameFromToken(jwt);
@@ -53,6 +56,7 @@ public class PurchaseService {
             }
             purchaseRepository.save(purchase);
 
+            leaderboardService.addPointsForPurchase(username, product.getId(), product.getScore());
             List<AchievementDTO> newAchievements = achievementService.verifyPurchaseAchievements(username, product);
             return new PurchaseResponseDTO(newAchievements, null);
         }

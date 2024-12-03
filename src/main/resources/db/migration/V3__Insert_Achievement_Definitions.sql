@@ -1,6 +1,6 @@
 INSERT INTO achievement_definition (id, name, description, threshold_bronze, threshold_silver, threshold_gold,
                                     achievement_type, achievement_parameter)
-VALUES (1, 'Product Explorer', 'Discover and expand your collection', 10, 50, 150, 'NONE', ''),
+VALUES (1, 'Product Explorer', 'Discover and expand your collection', 10, 50, 200, 'NONE', ''),
        (2, 'Health Guru', 'You''re making healthy choices! Collect products with Nutri-Score A', 15, 50, 150,
         'NUTRI_SCORE', 'A'),
        (3, 'Living on the Edge', 'We won''t judge! Collect products with Nutri-Score E', 10, 30, 100, 'NUTRI_SCORE',

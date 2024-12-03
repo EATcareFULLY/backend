@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/leaderboard")
 @RequiredArgsConstructor
@@ -20,17 +22,22 @@ public class LeaderboardController {
 
     //mock data for now TODO: implement actual leaderboard
     @GetMapping("/me")
-    public ResponseEntity<LeaderboardDTO> getLeaderboard(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(leaderboardService.getTestLeaderboard(jwt));
+    public ResponseEntity<LeaderboardDTO> getLeaderboardForCurrentUser(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(leaderboardService.getLeaderboardForCurrentUser(jwt));
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<LeaderboardDTO> getLeaderboardForUser(@PathVariable String username) {
-        return ResponseEntity.ok(leaderboardService.getLeaderboardForUser(username));
+    public ResponseEntity<LeaderboardDTO> getLeaderboardForSearchedUser(@PathVariable String username) {
+        LeaderboardDTO leaderboardForSearchedUser = leaderboardService.getLeaderboardForSearchedUser(username);
+        if (Objects.isNull(leaderboardForSearchedUser)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(leaderboardForSearchedUser);
+        }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<LeaderboardDTO> getEntireLeaderboard(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(leaderboardService.getEntireLeaderboard(jwt));
+    public ResponseEntity<LeaderboardDTO> getEntireLeaderboard() {
+        return ResponseEntity.ok(leaderboardService.getEntireLeaderboard());
     }
 }

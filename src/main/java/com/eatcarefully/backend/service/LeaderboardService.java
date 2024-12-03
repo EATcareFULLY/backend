@@ -3,99 +3,129 @@ package com.eatcarefully.backend.service;
 import com.eatcarefully.backend.dto.LeaderboardDTO;
 import com.eatcarefully.backend.dto.LeaderboardRowDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
+import com.eatcarefully.backend.model.leaderboard.LeaderboardPosition;
+import com.eatcarefully.backend.model.leaderboard.PointEvent;
+import com.eatcarefully.backend.repository.LeaderboardPositionRepository;
+import com.eatcarefully.backend.repository.PointEventRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LeaderboardService {
 
     private final JwtHelper jwtHelper;
-    public LeaderboardDTO getTestLeaderboard(Jwt jwt) {
+    private final PointEventRepository pointEventRepository;
+    private final LeaderboardPositionRepository leaderboardPositionRepository;
+
+    public void addPointsForPurchase(String username, String productBarcode, String nutriscore) {
+        Optional<PointEvent> existingPointEventOptional = pointEventRepository.findFirstByUsernameAndProductBarcode(username, productBarcode);
+        if (existingPointEventOptional.isEmpty()) {
+            pointEventRepository.save(new PointEvent(null, username, productBarcode));
+            updateUserScore(username, nutriscore);
+        }
+    }
+
+    public LeaderboardDTO getLeaderboardForCurrentUser(Jwt jwt) {
         String username = jwtHelper.getUsernameFromToken(jwt);
+        return getLeaderboardForUser(username);
+    }
 
-        List<LeaderboardRowDTO> topPositions = List.of(
-                new LeaderboardRowDTO(1, "Ben Dover", 15000),
-                new LeaderboardRowDTO(2, "Mike Coxlong", 14500),
-                new LeaderboardRowDTO(3, "Hue G. Rection", 14000)
-        );
-
-        // Context around position 15 (11-19)
-        List<LeaderboardRowDTO> userContext = List.of(
-                new LeaderboardRowDTO(11, "Player11", 9500),
-                new LeaderboardRowDTO(12, "Player12", 9300),
-                new LeaderboardRowDTO(13, "Player13", 9100),
-                new LeaderboardRowDTO(14, "Player14", 8900),
-                new LeaderboardRowDTO(15, username, 8700),  // Current user
-                new LeaderboardRowDTO(16, "Player16", 8500),
-                new LeaderboardRowDTO(17, "Player17", 8300),
-                new LeaderboardRowDTO(18, "Player18", 8100),
-                new LeaderboardRowDTO(19, "Player19", 7900)
-        );
-
-        return new LeaderboardDTO(topPositions, userContext);
+    public LeaderboardDTO getLeaderboardForSearchedUser(String username) {
+        Optional<LeaderboardPosition> searchedUserPosition = leaderboardPositionRepository.findByUsername(username);
+        if (searchedUserPosition.isPresent()) {
+            return getLeaderboardForUser(username);
+        } else {
+            return null;
+        }
     }
 
     public LeaderboardDTO getLeaderboardForUser(String username) {
+        List<LeaderboardPosition> positionsSorted = leaderboardPositionRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
+        int userPositionIndex = positionsSorted.indexOf(new LeaderboardPosition(null, username, null));
 
-        List<LeaderboardRowDTO> topPositions = List.of(
-                new LeaderboardRowDTO(1, "Ben Dover", 15000),
-                new LeaderboardRowDTO(2, "Mike Coxlong", 14500),
-                new LeaderboardRowDTO(3, "Hue G. Rection", 14000)
-        );
+        List<LeaderboardRowDTO> podiumPositions = positionsSorted.stream()
+                .limit(3)
+                .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
+                .toList();
 
-        // Context around user position 15 (4 above, 4 below)
-        List<LeaderboardRowDTO> userContext = List.of(
-                new LeaderboardRowDTO(16, "Player16", 8500),
-                new LeaderboardRowDTO(17, "Player17", 8300),
-                new LeaderboardRowDTO(18, "Player18", 8100),
-                new LeaderboardRowDTO(19, "Player19", 7900),
-                new LeaderboardRowDTO(20, username, 7700),  // searched user
-                new LeaderboardRowDTO(21, "Player21", 7500),
-                new LeaderboardRowDTO(22, "Player22", 7300),
-                new LeaderboardRowDTO(23, "Player23", 7100),
-                new LeaderboardRowDTO(24, "Player24", 6900)
-        );
+        int startIndex = 3;
+        int endIndex;
 
-        return new LeaderboardDTO(topPositions, userContext);
+        if (userPositionIndex <= 7) {
+            // show positions 4-10 if user is in top positions
+            endIndex = Math.min(10, positionsSorted.size());
+        } else {
+            startIndex = Math.max(3, userPositionIndex - 4);
+            endIndex = Math.min(userPositionIndex + 5, positionsSorted.size());
+        }
+
+        List<LeaderboardRowDTO> remainingPositions = positionsSorted.stream()
+                .skip(startIndex)
+                .limit(endIndex - startIndex)
+                .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
+                .toList();
+
+        return new LeaderboardDTO(podiumPositions, remainingPositions);
     }
 
-    public LeaderboardDTO getEntireLeaderboard(Jwt jwt) {
-        String username = jwtHelper.getUsernameFromToken(jwt);
+    private LeaderboardRowDTO createLeaderboardRow(LeaderboardPosition position, int index) {
+        return new LeaderboardRowDTO(index + 1, position.getUsername(), position.getPoints());
+    }
 
-        List<LeaderboardRowDTO> topPositions = List.of(
-                new LeaderboardRowDTO(1, "Ben Dover", 15000),
-                new LeaderboardRowDTO(2, "Mike Coxlong", 14500),
-                new LeaderboardRowDTO(3, "Hue G. Rection", 14000)
-        );
+    public LeaderboardDTO getEntireLeaderboard() {
+        List<LeaderboardPosition> positionsSorted = leaderboardPositionRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
 
-        List<LeaderboardRowDTO> theRest = List.of(
-                new LeaderboardRowDTO(4, "Player4", 13500),
-                new LeaderboardRowDTO(5, "Player5", 13000),
-                new LeaderboardRowDTO(6, "Player6", 12500),
-                new LeaderboardRowDTO(7, "Player7", 12000),
-                new LeaderboardRowDTO(8, "Player8", 11500),
-                new LeaderboardRowDTO(9, "Player9", 11000),
-                new LeaderboardRowDTO(10, "Player10", 10500),
-                new LeaderboardRowDTO(11, "Player11", 9500),
-                new LeaderboardRowDTO(12, "Player12", 9300),
-                new LeaderboardRowDTO(13, "Player13", 9100),
-                new LeaderboardRowDTO(14, "Player14", 8900),
-                new LeaderboardRowDTO(15, username, 8700),
-                new LeaderboardRowDTO(16, "Player16", 8500),
-                new LeaderboardRowDTO(17, "Player17", 8300),
-                new LeaderboardRowDTO(18, "Player18", 8100),
-                new LeaderboardRowDTO(19, "Player19", 7900),
-                new LeaderboardRowDTO(20, "Player20", 7700),
-                new LeaderboardRowDTO(21, "Player21", 7500),
-                new LeaderboardRowDTO(22, "Player22", 7300),
-                new LeaderboardRowDTO(23, "Player23", 7100),
-                new LeaderboardRowDTO(24, "Player24", 6900)
-        );
+        List<LeaderboardRowDTO> podiumPositions = positionsSorted.stream()
+                .limit(3)
+                .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
+                .toList();
 
-        return new LeaderboardDTO(topPositions, theRest);
+        List<LeaderboardRowDTO> remainingPositions = positionsSorted.stream()
+                .skip(3)
+                .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
+                .toList();
+
+        return new LeaderboardDTO(podiumPositions, remainingPositions);
+    }
+
+    // reset point events and leaderboard positions every monday at 0:00
+    @Scheduled(cron = "0 0 0 * * MON")
+    public void resetLeaderboardAndPointEvents() {
+        log.info("Clearing leaderboard data at: " + LocalDateTime.now());
+        pointEventRepository.deleteAll();
+        leaderboardPositionRepository.deleteAll();
+    }
+
+    private void updateUserScore(String username, String nutriscore) {
+        int pointsForPurchase;
+        if (nutriscore != null) {
+            pointsForPurchase = switch (nutriscore.toLowerCase()) {
+                case "a" -> 100;
+                case "b" -> 80;
+                case "c" -> 50;
+                case "d" -> 30;
+                default -> 10;  // products with nutriscore E or "unknown" get 10 points
+            };
+
+            Optional<LeaderboardPosition> userPositionOptional = leaderboardPositionRepository.findByUsername(username);
+
+            if (userPositionOptional.isPresent()) {
+                LeaderboardPosition userPosition = userPositionOptional.get();
+                userPosition.setPoints(userPosition.getPoints() + pointsForPurchase);
+                leaderboardPositionRepository.save(userPosition);
+            } else {
+                leaderboardPositionRepository.save(new LeaderboardPosition(null, username, pointsForPurchase));
+            }
+        }
     }
 }

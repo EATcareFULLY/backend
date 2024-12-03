@@ -24,7 +24,7 @@ public class AchievementController {
     @GetMapping("/all")
     public ResponseEntity<List<AchievementDTO>> getUserAchievements(@AuthenticationPrincipal Jwt jwt) {
         List<AchievementDTO> userAchievements = achievementService.getUserAchievements(jwt);
-        return ResponseEntity.ok(randomizeAchievementLevels(userAchievements));
+        return ResponseEntity.ok(userAchievements);
     }
 
     private List<AchievementDTO> randomizeAchievementLevels(List<AchievementDTO> achievements) {
