@@ -2,6 +2,8 @@ version: "3.8"
 
 services:
 
+  # docker compose file without dockerized spring app - to enable debugging inside the IDE
+
   database_server:
     image: postgres:latest
     container_name: postgres
@@ -50,13 +52,6 @@ services:
     networks:
       - eat_network
 
-#  server:
-#    build: .
-#    ports:
-#      - "8081:8081"
-#    networks:
-#      - eat_network
-#    depends_on: [database_server]
 
 networks:
   eat_network:
