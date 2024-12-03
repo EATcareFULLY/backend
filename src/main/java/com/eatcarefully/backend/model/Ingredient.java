@@ -1,5 +1,6 @@
 package com.eatcarefully.backend.model;
 
+import com.eatcarefully.backend.dto.IngredientDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,5 +26,9 @@ public class Ingredient {
     private String description;
 
     private Float content;
+
+    public IngredientDTO toDTO(){
+        return new IngredientDTO(name, description, content);
+    }
 
 }

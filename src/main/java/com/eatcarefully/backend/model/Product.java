@@ -25,6 +25,8 @@ public class Product {
 
     private String score;
 
+    private String novaGroup;
+
     private String brand;
 
     private String imageURL;
@@ -39,4 +41,7 @@ public class Product {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Ingredient> ingredients;
+
+    @ManyToMany
+    private List<Category> categories;
 }

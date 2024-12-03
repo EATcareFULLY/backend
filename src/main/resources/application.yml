@@ -38,11 +38,20 @@ spring:
       max-request-size: 10MB
       max-file-size: 10MB
 
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+    clean-disabled: ${FLYWAY_DISABLE_CLEAN:false}
+    clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:true}
+
 jwt:
   auth:
     converter:
       resource-id: backend_client
       principle-attribute: preferred_username
+
+app:
+  init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD:false}
 
 server:
   port: 8081

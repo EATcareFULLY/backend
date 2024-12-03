@@ -1,6 +1,6 @@
 package com.eatcarefully.backend;
 
-import com.eatcarefully.backend.controller.PurchaseRequest;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
 import com.eatcarefully.backend.helper.JwtHelper;
 import com.eatcarefully.backend.model.Product;
@@ -35,7 +35,7 @@ public class PurchaseServiceTest {
 
     private static final String VALID_BARCODE = "12345678";
     private static final String USERNAME = "testuser";
-    private final PurchaseRequest PURCHASE_REQUEST = new PurchaseRequest("12345678", 1);
+    private final PurchaseRequestDTO PURCHASE_REQUEST = new PurchaseRequestDTO("12345678", 1);
 
     @InjectMocks
     private PurchaseService purchaseService;

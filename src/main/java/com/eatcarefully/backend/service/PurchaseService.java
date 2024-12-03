@@ -1,10 +1,10 @@
 package com.eatcarefully.backend.service;
 
-import com.eatcarefully.backend.controller.PurchaseRequest;
-import com.eatcarefully.backend.dto.HistoryAnalysisProductDTO;
-import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.*;
 import com.eatcarefully.backend.helper.JwtHelper;
-import com.eatcarefully.backend.model.*;
+import com.eatcarefully.backend.model.Product;
+import com.eatcarefully.backend.model.Purchase;
+import com.eatcarefully.backend.model.PurchaseItem;
 import com.eatcarefully.backend.repository.PurchaseRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,35 +24,41 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final ProductService productService;
     private final JwtHelper jwtHelper;
+    private final AchievementService achievementService;
+    private final LeaderboardService leaderboardService;
 
-    public void addPurchaseItem(Jwt jwt, PurchaseRequest purchaseRequest) {
+    public PurchaseResponseDTO addPurchaseItem(Jwt jwt, PurchaseRequestDTO purchaseRequestDTO) {
         String username = jwtHelper.getUsernameFromToken(jwt);
 
         // get or create purchase
         Purchase purchase = getOrCreatePurchase(username, LocalDate.now());
 
         // get product
-        Product product = productService.getProductByBarcodeFromDatabase(purchaseRequest.getBarcode());
+        Product product = productService.getProductByBarcodeFromDatabase(purchaseRequestDTO.getBarcode());
 
         // alter and add purchase item
         if( product != null){
 
-            Optional<PurchaseItem> itemOpt = purchase.getPurchaseItemByBarcode(purchaseRequest.getBarcode());
+            Optional<PurchaseItem> purchaseItemOptional = purchase.getPurchaseItemByBarcode(purchaseRequestDTO.getBarcode());
 
-            if(itemOpt.isPresent()){
+            if(purchaseItemOptional.isPresent()){
 
-                PurchaseItem item = itemOpt.get();
-                item.setQuantity(item.getQuantity() + purchaseRequest.getQuantity());
+                PurchaseItem item = purchaseItemOptional.get();
+                item.setQuantity(item.getQuantity() + purchaseRequestDTO.getQuantity());
 
             } else {
                 PurchaseItem newItem = new PurchaseItem();
                 newItem.setProduct(product);
-                newItem.setQuantity(purchaseRequest.getQuantity());
+                newItem.setQuantity(purchaseRequestDTO.getQuantity());
                 purchase.addPurchaseItem(newItem);
             }
             purchaseRepository.save(purchase);
 
+            leaderboardService.addPointsForPurchase(username, product.getId(), product.getScore());
+            List<AchievementDTO> newAchievements = achievementService.verifyPurchaseAchievements(username, product);
+            return new PurchaseResponseDTO(newAchievements, null);
         }
+        return null;
     }
 
     public Purchase getOrCreatePurchase(String username, LocalDate purchaseDate){
