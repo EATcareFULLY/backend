@@ -75,7 +75,7 @@ public class LeaderboardService {
                 .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
                 .toList();
 
-        return new LeaderboardDTO(podiumPositions, remainingPositions);
+        return new LeaderboardDTO(podiumPositions, remainingPositions, userPositionIndex + 1, positionsSorted.size());
     }
 
     private LeaderboardRowDTO createLeaderboardRow(LeaderboardPosition position, int index) {
@@ -95,7 +95,7 @@ public class LeaderboardService {
                 .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
                 .toList();
 
-        return new LeaderboardDTO(podiumPositions, remainingPositions);
+        return new LeaderboardDTO(podiumPositions, remainingPositions, -1, positionsSorted.size());
     }
 
     // reset point events and leaderboard positions every monday at 0:00
