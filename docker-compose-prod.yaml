@@ -6,16 +6,26 @@ services:
     build: .
     container_name: spring_app
     ports:
-      - "8081:8081"   #test if exposing port is necessary
+      - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+
       SPRING_DATASOURCE_URL: jdbc:postgresql://database_main:5432/eatcarefully
       SPRING_DATASOURCE_USERNAME: ${SPRING_DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DB_PASSWORD}
+
       RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/eat-carefully
+      SERVER_HOST: ${SERVER_HOST:-http://localhost}  # default value is 'http://localhost'
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}  # default is 3000 so that default URL is 'http://localhost:3000'
       RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/certs
+      SECURITY_LOG_LEVEL: ${SECURITY_LOG_LEVEL:-INFO}
+
       TESSERACT_DATA_PATH: /app/tessdata
-      INIT_MOCK_LEADERBOARD: false
+
+      FLYWAY_DISABLE_CLEAN: ${FLYWAY_DISABLE_CLEAN:-true}
+      FLYWAY_ENABLE_CLEAN_ON_ERROR: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:-false}
+
+      INIT_MOCK_LEADERBOARD: ${INIT_LEADERBOARD:-false}
     depends_on:
       - database_main
       - keycloak

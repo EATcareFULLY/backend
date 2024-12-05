@@ -19,6 +19,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${RESOURCESERVER_JWT_ISSUER_URI:http://keycloak:8080/realms/eat-carefully}
+          frontend-issuer-uri: ${SERVER_HOST}:8080/realms/eat-carefully
           jwk-set-uri: ${RESOURCESERVER_JWT_JWK_SET_URI:http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/certs}
 
   servlet:
@@ -29,11 +30,14 @@ spring:
   flyway:
     baseline-on-migrate: true
     baseline-version: 0
-    clean-disabled: ${FLYWAY_DISABLE_CLEAN:true}
-    clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:false}
+    clean-disabled: ${FLYWAY_DISABLE_CLEAN}
+    clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR}
 
 security:
   enabled: ${SECURITY_ENABLED:true}
+  frontend:
+    base-url: ${SERVER_HOST}:${FRONTEND_PORT}
+
 
 jwt:
   auth:
@@ -42,7 +46,7 @@ jwt:
       principle-attribute: preferred_username
 
 app:
-  init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD:false}
+  init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD}
 
 server:
   port: 8081
@@ -50,10 +54,10 @@ server:
     context-path: /api
 
 tesseract:
-  path: ${TESSERACT_DATA_PATH:app/tessdata}
+  path: ${TESSERACT_DATA_PATH}
 
 logging:
   level:
     org:
       springframework:
-        security: DEBUG
+        security: ${SECURITY_LOG_LEVEL}

@@ -7,7 +7,7 @@
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
   "refreshTokenMaxReuse" : 0,
-  "accessTokenLifespan" : 1800,
+  "accessTokenLifespan": 3600,
   "accessTokenLifespanForImplicitFlow" : 5400,
   "ssoSessionIdleTimeout" : 1800,
   "ssoSessionMaxLifespan" : 36000,
@@ -622,7 +622,7 @@
       ],
       "webOrigins": [
         "http://spring_app:8081",
-        "http://react_app:3000"
+        "http://localhost:3000"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -725,15 +725,15 @@
       "clientId": "frontend_client_docker",
       "name": "",
       "description": "",
-      "rootUrl": "http://react_app:3000/",
-      "adminUrl": "http://react_app:3000/",
-      "baseUrl": "http://react_app:3000/",
+      "rootUrl": "http://localhost:3000/",
+      "adminUrl": "http://localhost:3000/",
+      "baseUrl": "http://localhost:3000/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://react_app:3000/*"
+        "http://localhost:3000/*"
       ],
       "webOrigins": [
         "*"
@@ -751,7 +751,7 @@
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://react_app:3000/*",
+        "post.logout.redirect.uris": "http://localhost:3000/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -2065,7 +2065,7 @@
     "oauth2DeviceCodeLifespan": "600",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "http://keycloak:8080",
+    "frontendUrl": "http://localhost:8080",
     "acr.loa.map": "{}"
   },
   "keycloakVersion" : "24.0.5",
