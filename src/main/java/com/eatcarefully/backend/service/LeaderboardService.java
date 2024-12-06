@@ -51,6 +51,11 @@ public class LeaderboardService {
 
     public LeaderboardDTO getLeaderboardForUser(String username) {
         List<LeaderboardPosition> positionsSorted = leaderboardPositionRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
+
+        if (positionsSorted.isEmpty()) {
+            return new LeaderboardDTO(List.of(), List.of(), 0, 0);
+        }
+
         int userPositionIndex = positionsSorted.indexOf(new LeaderboardPosition(null, username, null));
 
         List<LeaderboardRowDTO> podiumPositions = positionsSorted.stream()
@@ -71,7 +76,7 @@ public class LeaderboardService {
 
         List<LeaderboardRowDTO> remainingPositions = positionsSorted.stream()
                 .skip(startIndex)
-                .limit(endIndex - startIndex)
+                .limit(Math.max(0, endIndex - startIndex))
                 .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
                 .toList();
 
@@ -95,7 +100,7 @@ public class LeaderboardService {
                 .map(position -> createLeaderboardRow(position, positionsSorted.indexOf(position)))
                 .toList();
 
-        return new LeaderboardDTO(podiumPositions, remainingPositions, -1, positionsSorted.size());
+        return new LeaderboardDTO(podiumPositions, remainingPositions, 0, positionsSorted.size());
     }
 
     // reset point events and leaderboard positions every monday at 0:00
