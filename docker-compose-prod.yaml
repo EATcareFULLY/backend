@@ -14,7 +14,7 @@ services:
       - eat_network
 
   label_analysis_service:
-    image: eatcarefully-label-service
+    image: dspalek/eatcarefully-label-service:latest
     container_name: label_analysis_service
     environment:
       API_KEY: ${GEMINI_API_KEY}
@@ -32,7 +32,7 @@ services:
       - eat_network
 
   history_analysis_service:
-    image: eatcarefully-history-service
+    image: dspalek/eatcarefully-history-service:latest
     container_name: history_analysis_service
     networks:
       - eat_network
