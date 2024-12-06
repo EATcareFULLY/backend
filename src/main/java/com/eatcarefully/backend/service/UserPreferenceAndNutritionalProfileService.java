@@ -10,12 +10,14 @@ import com.eatcarefully.backend.model.UserPreferenceCompositeKey;
 import com.eatcarefully.backend.repository.PreferenceNameRepository;
 import com.eatcarefully.backend.repository.UserNutritionalProfileRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserPreferenceAndNutritionalProfileService {
 
 
@@ -28,20 +30,13 @@ public class UserPreferenceAndNutritionalProfileService {
     }
 
 
-    public UserNutritionalProfile createNutritionalProfile(String username, NutritionalThresholdsDTO dto){
+    public UserNutritionalProfile createNutritionalProfile(String username){
 
         // check if already exists
         if( userNutritionalProfileRepository.existsById(username))
             throw new IllegalArgumentException("Such user profile already exists");
 
-        UserNutritionalProfile profile = new UserNutritionalProfile(
-                username,
-                dto.getFat_threshold(),
-                dto.getProtein_threshold(),
-                dto.getCarbon_threshold(),
-                dto.getCalorie_threshold()
-        );
-
+        UserNutritionalProfile profile = new UserNutritionalProfile(username);
         return userNutritionalProfileRepository.save(profile);
 
     }
@@ -54,7 +49,8 @@ public class UserPreferenceAndNutritionalProfileService {
 
         if( profile == null){
 
-            profile = createNutritionalProfile(username, dto.getThresholds());
+            profile = createNutritionalProfile(username);
+            updateNutritionalProfileThresholds(profile, dto.getThresholds());
 
         }
         else {
@@ -150,10 +146,15 @@ public class UserPreferenceAndNutritionalProfileService {
 
     public UserThresholdAndPreferencesDTO getOrCreateThresholdsAndPreferences(String username){
 
-        if( ! userProfileExists(username))
-            createNutritionalProfile(username, new NutritionalThresholdsDTO());
+        if( ! userProfileExists(username)) {
+            log.info("Creating user profile");
+            createNutritionalProfile(username);
+        }
 
-        return new UserThresholdAndPreferencesDTO(getUserThresholds(username), getUserPreferencesList(username));
+        UserThresholdAndPreferencesDTO dto = new UserThresholdAndPreferencesDTO(getUserThresholds(username), getUserPreferencesList(username));
+        log.info(dto.toString());
+        return dto;
+
 
     }
 

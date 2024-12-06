@@ -20,10 +20,10 @@ import java.util.List;
 @Getter
 @Setter
 @org.hibernate.annotations.Check(
-        constraints = "fat_threshold BETWEEN 0 AND 5000 AND " +
-                "protein_threshold BETWEEN 0 AND 5000 AND " +
-                "carbohydrates_threshold BETWEEN 0 AND 5000 AND " +
-                "calories_threshold BETWEEN 0 AND 5000")
+       constraints = "fat_threshold BETWEEN 0 AND 5000 AND " +
+               "protein_threshold BETWEEN 0 AND 5000 AND " +
+               "carbohydrates_threshold BETWEEN 0 AND 5000 AND " +
+               "calories_threshold BETWEEN 0 AND 5000")
 
 public class UserNutritionalProfile {
 
@@ -34,6 +34,11 @@ public class UserNutritionalProfile {
     private int carbohydratesThreshold;
     private int caloriesThreshold;
 
+    static final int FAT_THRESHOLD_DEFAULT = 80;
+    static final int PROTEIN_THRESHOLD_DEFAULT = 100;
+    static final int CARBON_THRESHOLD_DEFAULT = 350;
+    static final int CALORIE_THRESHOLD_DEFAULT = 2000;
+
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPreference> preferences = new ArrayList<>();
 
@@ -43,6 +48,14 @@ public class UserNutritionalProfile {
         this.proteinThreshold = proteinThreshold;
         this.carbohydratesThreshold = carbohydratesThreshold;
         this. caloriesThreshold = caloriesThreshold;
+    }
+
+    public UserNutritionalProfile(String username){
+        this.username = username;
+        this.fatThreshold = FAT_THRESHOLD_DEFAULT;
+        this.proteinThreshold = PROTEIN_THRESHOLD_DEFAULT;
+        this.carbohydratesThreshold = CARBON_THRESHOLD_DEFAULT;
+        this.caloriesThreshold = CALORIE_THRESHOLD_DEFAULT;
     }
 
     public void addUserPreference(UserPreference preference){
