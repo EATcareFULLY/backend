@@ -45,6 +45,12 @@ jwt:
       principle-attribute: preferred_username
 
 app:
+  label-analysis-service:
+    url: ${LABEL_ANALYSIS_SERVICE_URL}
+  history-analysis-service:
+    url: ${HISTORY_ANALYSIS_SERVICE_URL}
+  recommendation-service:
+    url: ${RECOMMENDATION_SERVICE_URL}
   init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD}
 
 server:

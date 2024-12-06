@@ -2,11 +2,38 @@ version: "3.8"
 
 services:
 
-  # docker compose file without dockerized spring app - to enable debugging inside the IDE
 
-  database_server:
-    image: postgres:latest
-    container_name: postgres
+  dev_label_analysis_service:
+    image: eatcarefully-label-service
+    container_name: dev_label_analysis_service
+    ports:
+      - "80:80"
+    environment:
+      API_KEY: ${GEMINI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: gemini-1.5-flash
+      TEMPERATURE: 1.0
+      MAX_OUTPUT_TOKENS: 1000
+      INSTRUCTION: "Your responses should always be in valid json that can be parsed by python. Never create nested objects. If answer is more complex answer in few sentences. Do not use lists in response json."
+      PROMPT_TASK: "Examine product label: Does it contain harmful ingredients? If so, briefly describe their impact on health. Are there any allergens? Is the product highly processed? Are there food additives? If so, state if they are harmful. Does it contain ingredients that are harmful in excess (e.g., some first listed ingredients)? Is the product vegan, vegetarian, or does it contain gluten?"
+      PROMPT_RESPONSE_FORMAT: "Provide a JSON response with the following keys: harmful_ingredients, harmful_in_excess, allergens, is_highly_processed, food_additives, contains_gluten, is_vegan, is_vegetarian. Don't use escape sequences in your response. Do not add anything outside json."
+      PROMPT_LABEL_PREFIX: "Label:"
+      DB_HOST: localhost
+      DB_PORT: 6379
+    networks:
+      - dev_network
+
+  dev_history_analysis_service:
+    image: eatcarefully-history-service
+    container_name: dev_history_analysis_service
+    ports:
+      - "8000:8000"
+    networks:
+      - dev_network
+
+  dev_database_main:
+    image: postgres
+    container_name: dev_database_main
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -14,18 +41,18 @@ services:
     ports:
       - "6543:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - dev_postgres_data:/var/lib/postgresql/data
     networks:
-      - eat_network
+      - dev_network
 
-  keycloak:
-    container_name: keycloak
+  dev_keycloak:
+    container_name: dev_keycloak
     image: bitnami/keycloak:24.0.5
     volumes:
       - ./import/realm:/opt/bitnami/keycloak/data/import
       - ./import/theme:/opt/bitnami/keycloak/providers
     environment:
-      KEYCLOAK_DATABASE_HOST: keycloak_db
+      KEYCLOAK_DATABASE_HOST: dev_database_keycloak
       KEYCLOAK_DATABASE_NAME: keycloakdb
       KEYCLOAK_DATABASE_USER: postgres
       KEYCLOAK_DATABASE_PASSWORD: password
@@ -34,28 +61,24 @@ services:
       KEYCLOAK_EXTRA_ARGS: "--import-realm"
     ports:
       - "8080:8080"
+    depends_on:
+      - dev_database_keycloak
     networks:
-      - eat_network
+      - dev_network
 
-  keycloak_db:
+  dev_database_keycloak:
     image: postgres
-    container_name: keycloak_db
+    container_name: dev_database_keycloak
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: keycloakdb
-    ports:
-      - "54321:5432"
-    healthcheck:
-      test: "exit 0"
     networks:
-      - eat_network
+      - dev_network
 
 
 networks:
-  eat_network:
+  dev_network:
 volumes:
-  postgres_data:
-
-
+  dev_postgres_data:

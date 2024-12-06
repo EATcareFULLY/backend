@@ -13,6 +13,30 @@ services:
     networks:
       - eat_network
 
+  label_analysis_service:
+    image: eatcarefully-label-service
+    container_name: label_analysis_service
+    environment:
+      API_KEY: ${GEMINI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: gemini-1.5-flash
+      TEMPERATURE: 1.0
+      MAX_OUTPUT_TOKENS: 1000
+      INSTRUCTION: "Your responses should always be in valid json that can be parsed by python. Never create nested objects. If answer is more complex answer in few sentences. Do not use lists in response json."
+      PROMPT_TASK: "Examine product label: Does it contain harmful ingredients? If so, briefly describe their impact on health. Are there any allergens? Is the product highly processed? Are there food additives? If so, state if they are harmful. Does it contain ingredients that are harmful in excess (e.g., some first listed ingredients)? Is the product vegan, vegetarian, or does it contain gluten?"
+      PROMPT_RESPONSE_FORMAT: "Provide a JSON response with the following keys: harmful_ingredients, harmful_in_excess, allergens, is_highly_processed, food_additives, contains_gluten, is_vegan, is_vegetarian. Don't use escape sequences in your response. Do not add anything outside json."
+      PROMPT_LABEL_PREFIX: "Label:"
+      DB_HOST: localhost
+      DB_PORT: 6379
+    networks:
+      - eat_network
+
+  history_analysis_service:
+    image: eatcarefully-history-service
+    container_name: history_analysis_service
+    networks:
+      - eat_network
+
   spring_app:
     build: .
     container_name: spring_app
@@ -31,11 +55,13 @@ services:
       RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/certs
       SECURITY_LOG_LEVEL: ${SECURITY_LOG_LEVEL:-INFO}
 
-      TESSERACT_DATA_PATH: /app/tessdata
-
       FLYWAY_DISABLE_CLEAN: ${FLYWAY_DISABLE_CLEAN:-true}
       FLYWAY_ENABLE_CLEAN_ON_ERROR: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:-false}
 
+      LABEL_ANALYSIS_SERVICE_URL: ${LABEL_ANALYSIS_SERVICE_URL:-http://label_analysis_service:80/service/analyze-label}
+      HISTORY_ANALYSIS_SERVICE_URL: ${HISTORY_ANALYSIS_SERVICE_URL:-http://history_analysis_service:8000/analyze/}
+      RECOMMENDATION_SERVICE_URL: ${RECOMMENDATION_SERVICE_URL:-http://recommendation_service:404/not/known/atm/}  #TODO: adjust
+      TESSERACT_DATA_PATH: /app/tessdata
       INIT_MOCK_LEADERBOARD: ${INIT_LEADERBOARD:-false}
     depends_on:
       - database_main
@@ -52,6 +78,8 @@ services:
       POSTGRES_USER: ${SPRING_DB_USER}
       POSTGRES_PASSWORD: ${SPRING_DB_PASSWORD}
       POSTGRES_DB: eatcarefully
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

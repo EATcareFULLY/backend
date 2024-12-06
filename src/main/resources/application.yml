@@ -19,7 +19,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/eat-carefully
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+          jwk-set-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/certs
 
   servlet:
     multipart:
@@ -34,6 +34,8 @@ spring:
 
 security:
   enabled: ${SECURITY_ENABLED:true}
+  frontend:
+    base-url: ${SERVER_HOST:localhost}:${FRONTEND_PORT:3000}
 
 jwt:
   auth:
@@ -42,6 +44,12 @@ jwt:
       principle-attribute: preferred_username
 
 app:
+  label-analysis-service:
+    url: http://localhost:80/service/analyze-label
+  history-analysis-service:
+    url: http://localhost:8000/analyze/
+  recommendation-service:
+    url: http://localhost:404/not/known/atm/ #TODO: adjust the path to recommendation service
   init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD:false}
 
 server:

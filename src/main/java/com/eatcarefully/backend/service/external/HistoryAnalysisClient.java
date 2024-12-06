@@ -1,26 +1,19 @@
 package com.eatcarefully.backend.service.external;
 
-import com.eatcarefully.backend.dto.HistoryAnalysisProductDTO;
 import com.eatcarefully.backend.dto.HistoryAnalysisRequestDTO;
 import com.eatcarefully.backend.exceptions.DataNotFoundException;
-import com.eatcarefully.backend.exceptions.ModelValidationException;
 import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.ValidationException;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
+
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -29,8 +22,8 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class HistoryAnalysisClient implements IHistoryAnalysisClient{
 
-
-    private final String url = "http://localhost:8000/analyze/";
+    @Value("${app.history-analysis-service.url}")
+    private String url;
     private final WebClient webClient = WebClient.create();
     private final Duration TIMEOUT_IN_SECONDS  = Duration.ofSeconds(10);
 
@@ -38,8 +31,6 @@ public class HistoryAnalysisClient implements IHistoryAnalysisClient{
 
     @Override
     public Mono<ResponseEntity<ByteArrayResource>> submitProductsForHistoryAnalysis(HistoryAnalysisRequestDTO dto) {
-
-
 
             return webClient.post()
                     .uri(url)
