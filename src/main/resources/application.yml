@@ -35,7 +35,7 @@ spring:
 security:
   enabled: ${SECURITY_ENABLED:true}
   frontend:
-    base-url: ${SERVER_HOST:localhost}:${FRONTEND_PORT:3000}
+    base-url: ${SERVER_HOST:http://localhost}:${FRONTEND_PORT:3000}
 
 jwt:
   auth:
