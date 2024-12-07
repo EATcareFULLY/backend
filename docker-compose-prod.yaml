@@ -37,6 +37,14 @@ services:
     networks:
       - eat_network
 
+  recommendation_service:
+    image: dspalek/eatcarefully-recommendation-service:latest
+    container_name: recommendation_service
+    volumes:
+      - ./recommendation-data:/data
+    networks:
+      - eat_network
+
   spring_app:
     build: .
     container_name: spring_app
@@ -58,12 +66,15 @@ services:
       FLYWAY_DISABLE_CLEAN: ${FLYWAY_DISABLE_CLEAN:-true}
       FLYWAY_ENABLE_CLEAN_ON_ERROR: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:-false}
 
-      LABEL_ANALYSIS_SERVICE_URL: ${LABEL_ANALYSIS_SERVICE_URL:-http://label_analysis_service:80/service/analyze-label}
-      HISTORY_ANALYSIS_SERVICE_URL: ${HISTORY_ANALYSIS_SERVICE_URL:-http://history_analysis_service:8000/analyze/}
-      RECOMMENDATION_SERVICE_URL: ${RECOMMENDATION_SERVICE_URL:-http://recommendation_service:404/not/known/atm/}  #TODO: adjust
+      LABEL_ANALYSIS_SERVICE_URL: ${LABEL_ANALYSIS_SERVICE_URL:-http://XXX.XX.X.X:80/service/analyze-label}
+      HISTORY_ANALYSIS_SERVICE_URL: ${HISTORY_ANALYSIS_SERVICE_URL:-http://XXX.XX.X.X:8000/analyze/}
+      RECOMMENDATION_SERVICE_URL: ${RECOMMENDATION_SERVICE_URL:-http://XXX.XX.X.X:8000/api/v1/recommendations/}
       TESSERACT_DATA_PATH: /app/tessdata
       INIT_MOCK_LEADERBOARD: ${INIT_LEADERBOARD:-false}
     depends_on:
+      - label_analysis_service
+      - history_analysis_service
+      - recommendation_service
       - database_main
       - keycloak
     volumes:

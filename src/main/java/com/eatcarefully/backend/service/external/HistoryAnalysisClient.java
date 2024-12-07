@@ -25,7 +25,7 @@ public class HistoryAnalysisClient implements IHistoryAnalysisClient{
     @Value("${app.history-analysis-service.url}")
     private String url;
     private final WebClient webClient = WebClient.create();
-    private final Duration TIMEOUT_IN_SECONDS  = Duration.ofSeconds(10);
+    private final Duration TIMEOUT_IN_SECONDS = Duration.ofSeconds(20);
 
 
 
@@ -65,7 +65,7 @@ public class HistoryAnalysisClient implements IHistoryAnalysisClient{
                             new HttpTimeoutException("History analysis service took too long"))
 
                     .onErrorMap( WebClientRequestException.class, e ->
-                            new ServiceUnavailableException("History analysis service unavailable"));
+                            new ServiceUnavailableException("History analysis service unavailable. Localized error message: " + e.getLocalizedMessage() + " \t and the error message is: " + e.getMessage()));
 
 
 

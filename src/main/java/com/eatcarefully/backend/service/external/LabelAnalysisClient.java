@@ -5,8 +5,6 @@ import com.eatcarefully.backend.exceptions.ModelValidationException;
 import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.xml.bind.ValidationException;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +20,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 @Service
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Slf4j
 public class LabelAnalysisClient implements ILabelAnalysisClient{
 
@@ -31,7 +27,7 @@ public class LabelAnalysisClient implements ILabelAnalysisClient{
     private String url;
     private final WebClient webClient = WebClient.create();
     private final int MAX_LENGTH = 3000;
-    private final Duration TIMEOUT_IN_SECONDS  = Duration.ofSeconds(10);
+    private final Duration TIMEOUT_IN_SECONDS = Duration.ofSeconds(15);
 
 
     public Mono<JsonNode> submitLabelForAnalysis(String labelText) {
@@ -66,7 +62,7 @@ public class LabelAnalysisClient implements ILabelAnalysisClient{
                     new HttpTimeoutException("Label analysis service took too long"))
 
                 .onErrorMap(WebClientRequestException.class, e ->
-                        new ServiceUnavailableException("Label analysis service unavailable"));
+                        new ServiceUnavailableException("Label analysis service unavailable Localized error message: " + e.getLocalizedMessage() + " \t and the error message is: " + e.getMessage()));
 
 
 

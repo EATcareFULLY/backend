@@ -2,11 +2,9 @@ package com.eatcarefully.backend.service.external;
 
 import com.eatcarefully.backend.dto.RecommendationRequestDTO;
 import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
-import com.eatcarefully.backend.service.PurchaseService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.ValidationException;
-import lombok.AllArgsConstructor;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -19,13 +17,13 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 @Service
-@AllArgsConstructor
 public class RecommendationSystemClient implements IRecommendationSystemClient {
 
 
-    private final String url = "url";
+    @Value("${app.recommendation-service.url}")
+    private String url;
     private final WebClient webClient = WebClient.create();
-    private final Duration TIMEOUT_IN_SECONDS = Duration.ofSeconds(10);
+    private final Duration TIMEOUT_IN_SECONDS = Duration.ofSeconds(15);
 
 
     @Override
@@ -33,7 +31,7 @@ public class RecommendationSystemClient implements IRecommendationSystemClient {
 
 
         return webClient.post()
-                .uri(url)
+                .uri(url + dto.getProduct_code()/* + "/"*/)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .retrieve()
