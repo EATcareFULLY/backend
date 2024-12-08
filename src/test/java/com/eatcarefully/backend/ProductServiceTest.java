@@ -16,6 +16,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +55,10 @@ public class ProductServiceTest {
 
         Product product = new Product();
         product.setId(VALID_BARCODE_IN_DB);
+        product.setTags(List.of());
+        product.setAllergens(List.of());
+        product.setCategories(List.of());
+        product.setIngredients(List.of());
 
         Optional<Product> emptyProductOptional = Optional.empty();
         Optional<Product> productOptional = Optional.of(product);

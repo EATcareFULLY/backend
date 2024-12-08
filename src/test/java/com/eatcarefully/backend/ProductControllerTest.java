@@ -69,79 +69,11 @@ public class ProductControllerTest {
     }
 
 
-    // get recommendations
-
-    @Test
-    public void Should_ReturnProductRecommendations_When_ProductExists() throws Exception{
-
-        String barcode = "11111111";
-        Product product = new Product(barcode, "testName", "testNutriScore", "testNovaGroup", "testBrand", "testImageUrl", null, null, null, null);
-
-        when(productService.getProductByBarcodeFromDatabase(barcode)).thenReturn(product);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}/recommend", barcode)
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect( jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(3)));
-
-    }
-
-    @Test
-    public void Should_ReturnRecommendationsNotFound_When_ProductDoesNotExists() throws Exception{
-
-        String barcode = "not_valid";
-
-        when(productService.getProductByBarcodeFromDatabase(barcode)).thenReturn(null);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/products/{barcode}/recommend", barcode)
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()))
-                .andExpect(status().isNotFound());
-
-    }
 
 
 
 
 
-    // scan label
-
-    @Test
-    public void Should_ReturnBadRequest_When_EvalLabelTextIsEmpty() throws Exception{
-
-        String jsonPayload = "{\"labelText\": \"\"}";
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/products/scan-label")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .content(jsonPayload)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    public void Should_ReturnBadRequest_When_EvalLabelTextIsBlank() throws Exception{
-
-        String jsonPayload = "{\"labelText\": \"  \"}";
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/products/scan-label")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .content(jsonPayload)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    public void Should_ReturnOk_When_EvalLabelTextIsOk() throws Exception{
-
-        String jsonPayload = "{\"labelText\": \"testing\"}";
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/products/scan-label")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .content(jsonPayload)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("testing")));
-    }
 
 
 

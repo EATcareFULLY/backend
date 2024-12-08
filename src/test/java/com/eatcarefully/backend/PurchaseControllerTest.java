@@ -3,6 +3,8 @@ package com.eatcarefully.backend;
 import com.eatcarefully.backend.controller.ProductController;
 import com.eatcarefully.backend.controller.PurchaseController;
 import com.eatcarefully.backend.dto.PurchaseDTO;
+import com.eatcarefully.backend.dto.PurchaseRequestDTO;
+import com.eatcarefully.backend.dto.PurchaseResponseDTO;
 import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.model.PurchaseItem;
@@ -104,7 +106,7 @@ public class PurchaseControllerTest {
                         .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .content(String.valueOf(jsonPayload))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -119,7 +121,7 @@ public class PurchaseControllerTest {
                         .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .content(String.valueOf(jsonPayload))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -129,6 +131,11 @@ public class PurchaseControllerTest {
         JSONObject jsonPayload = new JSONObject();
         jsonPayload.put("barcode", VALID_BARCODE);
         jsonPayload.put("quantity", 3);
+
+        when(purchaseService.addPurchaseItem(
+                Mockito.any(Jwt.class),
+                Mockito.any(PurchaseRequestDTO.class)
+        )).thenReturn(new PurchaseResponseDTO(List.of(), ""));
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/purchases")
                         .with(SecurityMockMvcRequestPostProcessors.jwt())
@@ -328,7 +335,7 @@ public class PurchaseControllerTest {
 
 
     @Test
-    public void Should_ReturnOk_When_ItemExistsAndQuantityIsOk() throws Exception {
+    public void Should_ReturnOk_When_DeleteItemExistsAndQuantityIsOk() throws Exception {
 
         JSONObject jsonPayload = new JSONObject();
         jsonPayload.put("barcode", VALID_BARCODE);
@@ -370,7 +377,7 @@ public class PurchaseControllerTest {
     }
 
     @Test
-    public void Should_ReturnOk_When_ItemExistsAndQuantityIsTooBig() throws Exception {
+    public void Should_ReturnUnprccessabelEntity_When_DeleteItemExistsAndQuantityIsTooBig() throws Exception {
 
         JSONObject jsonPayload = new JSONObject();
         jsonPayload.put("barcode", VALID_BARCODE);

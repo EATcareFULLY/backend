@@ -7,6 +7,8 @@ import com.eatcarefully.backend.model.Product;
 import com.eatcarefully.backend.model.Purchase;
 import com.eatcarefully.backend.model.PurchaseItem;
 import com.eatcarefully.backend.repository.PurchaseRepository;
+import com.eatcarefully.backend.service.AchievementService;
+import com.eatcarefully.backend.service.LeaderboardService;
 import com.eatcarefully.backend.service.ProductService;
 import com.eatcarefully.backend.service.PurchaseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,11 @@ public class PurchaseServiceTest {
 
     @Mock
     private PurchaseRepository purchaseRepository;
+
+    @Mock
+    private AchievementService achievementService;
+
+    @Mock LeaderboardService leaderboardService;
 
     @Mock
     private Jwt jwt;
