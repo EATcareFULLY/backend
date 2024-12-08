@@ -31,7 +31,7 @@ public class RecommendationSystemClient implements IRecommendationSystemClient {
 
 
         return webClient.post()
-                .uri(url + dto.getProduct_code()/* + "/"*/)
+                .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .retrieve()
