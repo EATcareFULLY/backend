@@ -15,7 +15,11 @@ import com.eatcarefully.backend.service.external.IHistoryAnalysisClient;
 import com.eatcarefully.backend.service.external.ILabelAnalysisClient;
 import com.eatcarefully.backend.service.external.IRecommendationSystemClient;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
 import java.net.http.HttpTimeoutException;
@@ -30,6 +35,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 
@@ -52,6 +58,8 @@ public class ExternalServicesDispatcher {
     private UserPreferenceAndNutritionalProfileService preferencesService;
 
     private IRecommendationSystemClient recommendationSystemClient;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -143,18 +151,50 @@ public class ExternalServicesDispatcher {
     // recommendation system
 
     @PostMapping("/recommendation-system")
+    @Operation(summary = "Get product recommendations based on user's least healthy purchase")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved recommendations")
+    @ApiResponse(responseCode = "404", description = "No purchases found for today")
+    @ApiResponse(responseCode = "503", description = "Recommendation service unavailable")
     public Mono<JsonNode> handleSubmittingProductsForRecommendation(@AuthenticationPrincipal Jwt jwt) {
 
         String username = jwtHelper.getUsernameFromToken(jwt);
+        logger.debug("Processing recommendation request for user: {}", username);
+        LocalDate today = LocalDate.now();
 
-        String productBarcode = purchaseService.getBarcodeFromLeastHealthyProductPurchasedOn(username, LocalDate.now());
+        String productBarcode = purchaseService.getBarcodeFromLeastHealthyProductPurchasedOn(username, today);
+        if (Objects.isNull(productBarcode) || productBarcode.isEmpty()) {
+            throw new DataNotFoundException(
+                    String.format("No product purchased by user: %s on %s", username, today)
+            );
+        }
 
-        if (Objects.isNull(productBarcode) || productBarcode.isEmpty())
-            throw new DataNotFoundException("No product purchased by user:" + username + " on " + LocalDate.now());
 
         List<UserPreferenceDTO> preferences = preferencesService.getUserPreferencesList(username);
+        if (preferences.isEmpty()) {
+            throw new DataNotFoundException("No preferences found for user: " + username);
+        }
 
-        return recommendationSystemClient.submitProductsForRecommendation(new RecommendationRequestDTO(productBarcode, N_RECOMMENDATION_LIMIT, preferences));
+        RecommendationRequestDTO requestDTO = new RecommendationRequestDTO(
+                productBarcode,
+                N_RECOMMENDATION_LIMIT,
+                preferences
+        );
+
+        return recommendationSystemClient
+                .submitProductsForRecommendation(requestDTO)
+                .doOnSuccess(response ->
+                        logger.debug("Successfully retrieved recommendations for user: {}", username)
+                )
+                .doOnError(error ->
+                        logger.error("Error getting recommendations for user: {}: {}",
+                                username, error.getMessage())
+                )
+                .onErrorResume(WebClientRequestException.class, e ->
+                        Mono.error(new ServiceUnavailableException("Recommendation service is currently unavailable"))
+                )
+                .onErrorResume(TimeoutException.class, e ->
+                        Mono.error(new ServiceUnavailableException("Recommendation service timed out"))
+                );
 
 
     }
