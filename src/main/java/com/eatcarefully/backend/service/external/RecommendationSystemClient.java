@@ -29,7 +29,6 @@ public class RecommendationSystemClient implements IRecommendationSystemClient {
     @Override
     public Mono<JsonNode> submitProductsForRecommendation(RecommendationRequestDTO dto) {
 
-
         return webClient.post()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -53,6 +52,7 @@ public class RecommendationSystemClient implements IRecommendationSystemClient {
 
                 .onErrorMap(WebClientRequestException.class, e ->
                         new ServiceUnavailableException("Recommendation service unavailable"));
+
 
 
     }
