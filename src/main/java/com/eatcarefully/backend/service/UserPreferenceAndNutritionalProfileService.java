@@ -128,6 +128,10 @@ public class UserPreferenceAndNutritionalProfileService {
 
     public List<UserPreferenceDTO> getUserPreferencesList(String username){
 
+        if( ! userProfileExists(username)) {
+            createNutritionalProfile(username);
+        }
+
         UserNutritionalProfile profile = userNutritionalProfileRepository.findById(username).orElse(null);
 
         return (profile != null) ? profile.getListOfUserPreferenceDTO() : null;
@@ -136,6 +140,10 @@ public class UserPreferenceAndNutritionalProfileService {
 
 
     public NutritionalThresholdsDTO getUserThresholds(String username){
+
+        if( ! userProfileExists(username)) {
+            createNutritionalProfile(username);
+        }
 
         UserNutritionalProfile profile = userNutritionalProfileRepository.findById(username).orElse(null);
 
@@ -147,7 +155,6 @@ public class UserPreferenceAndNutritionalProfileService {
     public UserThresholdAndPreferencesDTO getOrCreateThresholdsAndPreferences(String username){
 
         if( ! userProfileExists(username)) {
-            log.info("Creating user profile");
             createNutritionalProfile(username);
         }
 
