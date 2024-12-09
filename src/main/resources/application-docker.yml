@@ -46,11 +46,11 @@ jwt:
 
 app:
   label-analysis-service:
-    url: ${LABEL_ANALYSIS_SERVICE_URL}
+    url: http://${LABEL_ANALYSIS_SERVICE_HOST}:80/service/analyze-label
   history-analysis-service:
-    url: ${HISTORY_ANALYSIS_SERVICE_URL}
+    url: http://${HISTORY_ANALYSIS_SERVICE_HOST}:8000/analyze/
   recommendation-service:
-    url: ${RECOMMENDATION_SERVICE_URL}
+    url: http://${RECOMMENDATION_SERVICE_HOST}:8000/api/v1/recommendations/
   init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD}
 
 server:
