@@ -15,15 +15,12 @@ import com.eatcarefully.backend.service.external.IHistoryAnalysisClient;
 import com.eatcarefully.backend.service.external.ILabelAnalysisClient;
 import com.eatcarefully.backend.service.external.IRecommendationSystemClient;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.netty.handler.timeout.TimeoutException;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
@@ -32,7 +29,7 @@ import java.net.http.HttpTimeoutException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -146,14 +143,14 @@ public class ExternalServicesDispatcher {
     // recommendation system
 
     @PostMapping("/recommendation-system")
-    public Mono<JsonNode> handleSubmittingProductsForRecommendation(@AuthenticationPrincipal Jwt jwt, LocalDate date){
+    public Mono<JsonNode> handleSubmittingProductsForRecommendation(@AuthenticationPrincipal Jwt jwt) {
 
         String username = jwtHelper.getUsernameFromToken(jwt);
 
-        String productBarcode = purchaseService.getBarcodeFromLeastHealthyProductPurchasedOn(username, date);
+        String productBarcode = purchaseService.getBarcodeFromLeastHealthyProductPurchasedOn(username, LocalDate.now());
 
-        if(productBarcode.isEmpty())
-            throw new DataNotFoundException("No product purchased by user:" + username + " on " + date);
+        if (Objects.isNull(productBarcode) || productBarcode.isEmpty())
+            throw new DataNotFoundException("No product purchased by user:" + username + " on " + LocalDate.now());
 
         List<UserPreferenceDTO> preferences = preferencesService.getUserPreferencesList(username);
 

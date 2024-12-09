@@ -1,14 +1,22 @@
 package com.eatcarefully.backend.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -18,8 +26,17 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${spring.security.enabled}")
+    @Value("${security.enabled}")
     private boolean securityEnabled;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String defaultIssuer;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.frontend-issuer-uri:http://localhost:8080/realms/eat-carefully}")
+    private String frontendIssuer;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String jwkSetUri;
 
     private final JwtAuthConverter jwtAuthConverter;
 
@@ -33,7 +50,7 @@ public class SecurityConfig {
                             .anyRequest().authenticated()
                     )
                     .oauth2ResourceServer(oauth2 -> oauth2
-                            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter))
+                            .authenticationManagerResolver(issuerAuthenticationManagerResolver())
                     )
                     .sessionManagement(session -> session
                             .sessionCreationPolicy(STATELESS)
@@ -46,5 +63,20 @@ public class SecurityConfig {
                     );
         }
         return http.build();
+    }
+
+    private JwtIssuerAuthenticationManagerResolver issuerAuthenticationManagerResolver() {
+        Map<String, AuthenticationManager> authenticationManagers = new HashMap<>();
+
+        Arrays.asList(defaultIssuer, frontendIssuer).forEach(issuerUri -> {
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+
+            var provider = new JwtAuthenticationProvider(jwtDecoder);
+            provider.setJwtAuthenticationConverter(jwtAuthConverter);
+
+            authenticationManagers.put(issuerUri, provider::authenticate);
+        });
+
+        return new JwtIssuerAuthenticationManagerResolver(authenticationManagers::get);
     }
 }

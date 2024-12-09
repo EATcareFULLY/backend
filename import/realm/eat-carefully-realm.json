@@ -1,11 +1,13 @@
 {
   "id" : "495d2342-56d9-44d4-9e59-45d09c7bb6f3",
   "realm" : "eat-carefully",
+  "displayName": "",
+  "displayNameHtml": "",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
   "refreshTokenMaxReuse" : 0,
-  "accessTokenLifespan" : 1800,
+  "accessTokenLifespan": 3600,
   "accessTokenLifespanForImplicitFlow" : 5400,
   "ssoSessionIdleTimeout" : 1800,
   "ssoSessionMaxLifespan" : 36000,
@@ -291,6 +293,7 @@
         "containerId" : "f2a9b802-2787-4313-8fee-122b54d9d3e6",
         "attributes" : { }
       } ],
+      "frontend_client_docker": [],
       "account" : [ {
         "id" : "72e913a6-8d32-4d51-ac6a-745accf8b70e",
         "name" : "view-profile",
@@ -365,7 +368,9 @@
         "clientRole" : true,
         "containerId" : "da5b799f-ba61-4879-bfdb-552fcc308d81",
         "attributes" : { }
-      } ]
+      }
+      ],
+      "backend_client_docker": []
     }
   },
   "groups" : [ ],
@@ -582,6 +587,69 @@
       "display.on.consent.screen" : "false",
       "token.response.type.bearer.lower-case" : "false"
     },
+    "authenticationFlowBindingOverrides": {},
+    "fullScopeAllowed": true,
+    "nodeReRegistrationTimeout": -1,
+    "defaultClientScopes": [
+      "web-origins",
+      "acr",
+      "profile",
+      "roles",
+      "email"
+    ],
+    "optionalClientScopes": [
+      "address",
+      "phone",
+      "offline_access",
+      "microprofile-jwt"
+    ]
+  },
+    {
+      "id": "aac725ef-f102-4c77-91be-d146b6a905f9",
+      "clientId": "backend_client_docker",
+      "name": "",
+      "description": "",
+      "rootUrl": "http://spring_app:8081/",
+      "adminUrl": "http://spring_app:8081/",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "Bo83S0dMVuoU9u92o0RWwlH7FmYHOh9p",
+      "redirectUris": [
+        "http://spring_app:8081/login/oauth2/code/keycloak"
+      ],
+      "webOrigins": [
+        "http://spring_app:8081",
+        "http://localhost:3000"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "client.secret.creation.time": "1733260476",
+        "post.logout.redirect.uris": "*",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "use.refresh.tokens": "true",
+        "oidc.ciba.grant.enabled": "false",
+        "client.use.lightweight.access.token.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "client_credentials.use_refresh_token": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "require.pushed.authorization.requests": "false",
+        "acr.loa.map": "{}",
+        "display.on.consent.screen": "false",
+        "token.response.type.bearer.lower-case": "false"
+    },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
@@ -653,6 +721,59 @@
     "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
+      "id": "5b7bb059-221f-4d43-b0b3-c8ab045766b5",
+      "clientId": "frontend_client_docker",
+      "name": "",
+      "description": "",
+      "rootUrl": "http://localhost:3000/",
+      "adminUrl": "http://localhost:3000/",
+      "baseUrl": "http://localhost:3000/",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "http://localhost:3000/*",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "display.on.consent.screen": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
     "id" : "2111a6a2-70c8-45f7-b941-b4dc048849d5",
     "clientId" : "realm-management",
     "name" : "${client_realm-management}",
@@ -1262,7 +1383,16 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-full-name-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper" ]
+        "allowed-protocol-mapper-types": [
+          "saml-user-attribute-mapper",
+          "oidc-usermodel-property-mapper",
+          "saml-role-list-mapper",
+          "saml-user-property-mapper",
+          "oidc-full-name-mapper",
+          "oidc-address-mapper",
+          "oidc-sha256-pairwise-sub-mapper",
+          "oidc-usermodel-attribute-mapper"
+        ]
       }
     }, {
       "id" : "0a55ccfa-598d-4f18-a93a-0a91b699c108",
@@ -1281,7 +1411,16 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types": [
+          "oidc-address-mapper",
+          "oidc-usermodel-property-mapper",
+          "saml-role-list-mapper",
+          "oidc-sha256-pairwise-sub-mapper",
+          "oidc-full-name-mapper",
+          "saml-user-property-mapper",
+          "oidc-usermodel-attribute-mapper",
+          "saml-user-attribute-mapper"
+        ]
       }
     }, {
       "id" : "e9019e5b-05d2-4da5-a78a-b1827a8a3307",
@@ -1915,17 +2054,19 @@
   "firstBrokerLoginFlow" : "first broker login",
   "attributes" : {
     "cibaBackchannelTokenDeliveryMode" : "poll",
-    "cibaExpiresIn" : "120",
     "cibaAuthRequestedUserHint" : "login_hint",
-    "oauth2DeviceCodeLifespan" : "600",
     "clientOfflineSessionMaxLifespan" : "0",
     "oauth2DevicePollingInterval" : "5",
     "clientSessionIdleTimeout" : "0",
-    "parRequestUriLifespan" : "60",
-    "clientSessionMaxLifespan" : "0",
     "clientOfflineSessionIdleTimeout" : "0",
     "cibaInterval" : "5",
-    "realmReusableOtpCode" : "false"
+    "realmReusableOtpCode": "false",
+    "cibaExpiresIn": "120",
+    "oauth2DeviceCodeLifespan": "600",
+    "parRequestUriLifespan": "60",
+    "clientSessionMaxLifespan": "0",
+    "frontendUrl": "http://localhost:8080",
+    "acr.loa.map": "{}"
   },
   "keycloakVersion" : "24.0.5",
   "userManagedAccessAllowed" : false,

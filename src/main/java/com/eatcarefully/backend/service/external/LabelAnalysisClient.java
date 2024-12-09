@@ -2,40 +2,37 @@ package com.eatcarefully.backend.service.external;
 
 
 import com.eatcarefully.backend.exceptions.ModelValidationException;
-import com.eatcarefully.backend.helper.ImageHelper;
-import com.eatcarefully.backend.service.OCRService;
+import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.netty.handler.timeout.ReadTimeoutException;
-import java.util.concurrent.TimeoutException;
 import jakarta.xml.bind.ValidationException;
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
-import com.eatcarefully.backend.exceptions.ServiceUnavailableException;
+
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
-import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 @Service
-@AllArgsConstructor
-
+@Slf4j
 public class LabelAnalysisClient implements ILabelAnalysisClient{
 
-
-    private final String url = "http://localhost/service/analyze-label";
+    @Value("${app.label-analysis-service.url}")
+    private String url;
     private final WebClient webClient = WebClient.create();
     private final int MAX_LENGTH = 3000;
-    private final Duration TIMEOUT_IN_SECONDS  = Duration.ofSeconds(10);
+    private final Duration TIMEOUT_IN_SECONDS = Duration.ofSeconds(15);
 
 
     public Mono<JsonNode> submitLabelForAnalysis(String labelText) {
 
+        log.info("Injected URL of label analysis service is " + url);
         if(! isLabelTextValid(labelText))
             return Mono.error(new ModelValidationException("Label text is not valid. (empty, blank or too long)"));
 
@@ -64,8 +61,8 @@ public class LabelAnalysisClient implements ILabelAnalysisClient{
                 .onErrorMap(TimeoutException.class, e ->
                     new HttpTimeoutException("Label analysis service took too long"))
 
-                .onErrorMap( WebClientRequestException.class, e ->
-                        new ServiceUnavailableException("Label analysis service unavailable"));
+                .onErrorMap(WebClientRequestException.class, e ->
+                        new ServiceUnavailableException("Label analysis service unavailable Localized error message: " + e.getLocalizedMessage() + " \t and the error message is: " + e.getMessage()));
 
 
 
@@ -76,15 +73,5 @@ public class LabelAnalysisClient implements ILabelAnalysisClient{
 
         return ILabelAnalysisClient.super.isLabelTextValid(labelText) && labelText.length() <= MAX_LENGTH;
     }
-
-
-
-
-
-
-
-
-
-
 
 }

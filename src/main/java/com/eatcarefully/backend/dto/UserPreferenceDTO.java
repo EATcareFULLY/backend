@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class UserPreferenceDTO {
 
     private String name;
-    private int wanted;
+    private int status;
 
 }

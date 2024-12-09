@@ -1,45 +1,69 @@
 spring:
   application:
     name: backend
-  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driverClassName: org.h2.Driver
-#    username: sa
-#    password: password
 
-    url: jdbc:postgresql://http://database_server:5432//eatcarefully
-    username: postgres
-    password: postgres
+  # postgres as database
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
-#    database-platform: org.hibernate.dialect.H2Dialect
-
 
   security:
     oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: backend_client
-            client-secret: HtGU6TxlSfOz2rKBnhEi9XRk2rLJtKJw
-            authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/keycloak
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          keycloak:
-            authorization-uri: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/auth
-            token-uri: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/token
-            user-info-uri: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/userinfo
-            jwk-set-uri: http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/certs
-            user-name-attribute: preferred_username
+      resourceserver:
+        jwt:
+          issuer-uri: ${RESOURCESERVER_JWT_ISSUER_URI:http://keycloak:8080/realms/eat-carefully}
+          frontend-issuer-uri: ${SERVER_HOST}:8080/realms/eat-carefully
+          jwk-set-uri: ${RESOURCESERVER_JWT_JWK_SET_URI:http://keycloak:8080/realms/eat-carefully/protocol/openid-connect/certs}
 
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
+
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+    clean-disabled: ${FLYWAY_DISABLE_CLEAN}
+    clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR}
+
+security:
+  enabled: ${SECURITY_ENABLED:true}
+  frontend:
+    base-url: ${SERVER_HOST}:${FRONTEND_PORT}
+
+
+jwt:
+  auth:
+    converter:
+      resource-id: backend_client_docker
+      principle-attribute: preferred_username
+
+app:
+  label-analysis-service:
+    url: http://${LABEL_ANALYSIS_SERVICE_HOST}:80/service/analyze-label
+  history-analysis-service:
+    url: http://${HISTORY_ANALYSIS_SERVICE_HOST}:8000/analyze/
+  recommendation-service:
+    url: http://${RECOMMENDATION_SERVICE_HOST}:8000/api/v1/recommendations/
+  init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD}
 
 server:
   port: 8081
+  servlet:
+    context-path: /api
+
+tesseract:
+  path: ${TESSERACT_DATA_PATH}
+
+logging:
+  level:
+    org:
+      springframework:
+        security: ${SECURITY_LOG_LEVEL}
+        web.reactive.function.client: DEBUG

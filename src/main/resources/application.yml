@@ -3,35 +3,22 @@ spring:
     name: backend
 
   # postgres as database
-
   datasource:
     url: jdbc:postgresql://localhost:6543/eatcarefully
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
-
-  #TODO: could be useful for future testing
-
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driverClassName: org.h2.Driver
-#    username: sa
-#    password: password
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/eat-carefully
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
-    enabled: ${SECURITY_ENABLED:true}
+          jwk-set-uri: http://localhost:8080/realms/eat-carefully/protocol/openid-connect/certs
 
   servlet:
     multipart:
@@ -44,6 +31,11 @@ spring:
     clean-disabled: ${FLYWAY_DISABLE_CLEAN:false}
     clean-on-validation-error: ${FLYWAY_ENABLE_CLEAN_ON_ERROR:true}
 
+security:
+  enabled: ${SECURITY_ENABLED:true}
+  frontend:
+    base-url: ${SERVER_HOST:http://localhost}:${FRONTEND_PORT:3000}
+
 jwt:
   auth:
     converter:
@@ -51,6 +43,12 @@ jwt:
       principle-attribute: preferred_username
 
 app:
+  label-analysis-service:
+    url: http://localhost:80/service/analyze-label
+  history-analysis-service:
+    url: http://localhost:8000/analyze/
+  recommendation-service:
+    url: http://localhost:8001/api/v1/recommendations/
   init-mock-leaderboard: ${INIT_MOCK_LEADERBOARD:false}
 
 server:
@@ -60,3 +58,4 @@ server:
 
 tesseract:
   path: ${TESSERACT_DATA_PATH:classpath:tessdata}
+
