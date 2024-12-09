@@ -32,7 +32,7 @@ services:
       - dev_network
 
   dev_recommendation_service:
-    image: dspalek/eatcarefully-recommendation-service:latest
+    image: stingsek/eatcarefully-recommendation-service:latest
     container_name: dev_recommendation_service
     ports:
       - "8001:8000"

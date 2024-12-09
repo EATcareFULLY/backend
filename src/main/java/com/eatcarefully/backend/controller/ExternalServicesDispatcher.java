@@ -170,9 +170,6 @@ public class ExternalServicesDispatcher {
 
 
         List<UserPreferenceDTO> preferences = preferencesService.getUserPreferencesList(username);
-        if (preferences.isEmpty()) {
-            throw new DataNotFoundException("No preferences found for user: " + username);
-        }
 
         RecommendationRequestDTO requestDTO = new RecommendationRequestDTO(
                 productBarcode,
