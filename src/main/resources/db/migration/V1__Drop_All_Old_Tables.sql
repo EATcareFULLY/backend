@@ -1,0 +1,34 @@
+-- delete old tables
+DROP TABLE IF EXISTS achievement_progress CASCADE;
+DROP TABLE IF EXISTS achievement_definition CASCADE;
+DROP TABLE IF EXISTS allergen CASCADE;
+DROP TABLE IF EXISTS category CASCADE;
+DROP TABLE IF EXISTS ingredient CASCADE;
+DROP TABLE IF EXISTS leaderboard_position CASCADE;
+DROP TABLE IF EXISTS point_event CASCADE;
+DROP TABLE IF EXISTS preference_name CASCADE;
+DROP TABLE IF EXISTS product_tags CASCADE;
+DROP TABLE IF EXISTS product_allergens CASCADE;
+DROP TABLE IF EXISTS product_categories CASCADE;
+DROP TABLE IF EXISTS product_ingredients CASCADE;
+DROP TABLE IF EXISTS purchase_item CASCADE;
+DROP TABLE IF EXISTS purchase CASCADE;
+DROP TABLE IF EXISTS product CASCADE;
+DROP TABLE IF EXISTS tag CASCADE;
+DROP TABLE IF EXISTS user_nutritional_profile CASCADE;
+DROP TABLE IF EXISTS user_preference CASCADE;
+
+-- delete old sequences
+DROP SEQUENCE IF EXISTS achievement_progress_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS allergen_seq CASCADE;
+DROP SEQUENCE IF EXISTS category_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS ingredient_seq CASCADE;
+DROP SEQUENCE IF EXISTS leaderboard_position_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS point_event_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS preference_name_seq CASCADE;
+DROP SEQUENCE IF EXISTS purchase_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS purchase_item_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS tag_seq CASCADE;
+
+-- delete old indexes
+DROP INDEX IF EXISTS idx_points;
