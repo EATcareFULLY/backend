@@ -90,7 +90,7 @@ public class UserPreferenceAndNutritionalProfileService {
 
             UserPreference profilePref = profile.getUserPreferenceByName(dto.getName());
 
-            if(dto.getWanted() == 0){
+            if (dto.getStatus() == 0) {
 
                 //remove if exists
 
@@ -103,7 +103,7 @@ public class UserPreferenceAndNutritionalProfileService {
 
                 if(profilePref != null)
 
-                    profilePref.setWanted(dto.getWanted());
+                    profilePref.setWanted(dto.getStatus());
 
                 else{
 
@@ -111,7 +111,7 @@ public class UserPreferenceAndNutritionalProfileService {
                     UserPreference newPref = new UserPreference();
                     newPref.setId(key);
                     newPref.setPreferenceName(prefName);
-                    newPref.setWanted(dto.getWanted());
+                    newPref.setWanted(dto.getStatus());
 
                     profile.addUserPreference(newPref);
 
