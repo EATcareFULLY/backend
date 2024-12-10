@@ -151,7 +151,11 @@ public class PurchaseService {
         if(purchase == null)
             return null;
 
-        ArrayList<Product> purchasesProducts = new ArrayList<>(purchase.getPurchasedItems().stream().map(PurchaseItem::getProduct).toList());
+        ArrayList<Product> purchasesProducts = new ArrayList<>(purchase.getPurchasedItems()
+                .stream()
+                .map(PurchaseItem::getProduct)
+                .filter( product -> !product.getScore().equals("unknown"))
+                .toList());
 
         purchasesProducts.sort( (p1,p2) -> p2.getScore().compareTo(p1.getScore()));
 
