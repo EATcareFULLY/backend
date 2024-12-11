@@ -1,4 +1,4 @@
-package com.eatcarefully.backend;
+package com.eatcarefully.backend.controllers;
 
 
 import com.eatcarefully.backend.controller.ProductController;

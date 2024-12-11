@@ -1,4 +1,4 @@
-package com.eatcarefully.backend;
+package com.eatcarefully.backend.services;
 
 import com.eatcarefully.backend.dto.PurchaseRequestDTO;
 import com.eatcarefully.backend.dto.PurchaseDTO;
